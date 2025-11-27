@@ -4,7 +4,7 @@ A modern, high-performance personal portfolio website built with React, showcasi
 
 🌐 **Live Demo:** [yahyah-odin.is-a.dev](https://yahyah-odin.is-a.dev)
 
-## ✨ Features
+## Features
 
 * **Bento Grid Layout:** A responsive, modular grid system for the landing page.
 * **Iridescent Theme:** Custom light/dark mode with "Planet Her" inspired gradients and glassmorphism effects.
@@ -13,7 +13,7 @@ A modern, high-performance personal portfolio website built with React, showcasi
 * **Project Lightbox:** A custom modal system for viewing project details and high-res galleries with zoom/pan support.
 * **Optimized Performance:** Lazy loading, WebP assets, and GPU-accelerated animations.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 * **Framework:** React + Vite
 * **Language:** TypeScript
@@ -22,7 +22,7 @@ A modern, high-performance personal portfolio website built with React, showcasi
 * **3D Graphics:** Three.js + React Three Fiber
 * **Routing:** React Router DOM
 
-## 🚀 Running Locally
+## Running Locally
 
 1.  **Clone the repository**
     ```bash
@@ -40,13 +40,13 @@ A modern, high-performance personal portfolio website built with React, showcasi
     npm run dev
     ```
 
-## 📂 Project Structure
+## Project Structure
 
 * `/components` - Reusable UI components (BentoGrid, NavBar, Footer, etc.)
 * `/pages` - Main route views (Home, ProjectList, CV)
 * `/public` - Static assets (Images, PDFs, CNAME)
 * `theme.ts` - Custom MUI theme definitions
 
-## 📄 License
+## License
 
 This project is open source and available under the [MIT License](LICENSE).
