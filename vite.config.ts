@@ -7,7 +7,7 @@ export default defineConfig(({ mode }) => {
   return {
     // IMPORTANT: Set base to '/' for custom domains (like .is-a.dev)
     // If you were using standard GitHub Pages (username.github.io/repo), this would be '/repo-name/'
-    base: '/', 
+    base: '/yahyah-odin-portfolio/', 
     
     server: {
       port: 3000,
