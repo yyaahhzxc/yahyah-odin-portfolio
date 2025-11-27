@@ -1,20 +1,52 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Iridescent Portfolio
 
-# Run and deploy your AI Studio app
+A modern, high-performance personal portfolio website built with React, showcasing a glassmorphism aesthetic, 3D interactive elements, and seamless page transitions.
 
-This contains everything you need to run your app locally.
+🌐 **Live Demo:** [yahyah-odin.is-a.dev](https://yahyah-odin.is-a.dev)
 
-View your app in AI Studio: https://ai.studio/apps/drive/120qk2Yrtkhblzb1x_esjIbXFkhM65yNO
+## Features
 
-## Run Locally
+* **Bento Grid Layout:** A responsive, modular grid system for the landing page.
+* **Iridescent Theme:** Custom light/dark mode with "Planet Her" inspired gradients and glassmorphism effects.
+* **Interactive 3D Background:** Procedural particle system using Three.js that reacts to mouse movement.
+* **Seamless Animations:** Page transitions and micro-interactions powered by Framer Motion.
+* **Project Lightbox:** A custom modal system for viewing project details and high-res galleries with zoom/pan support.
+* **Optimized Performance:** Lazy loading, WebP assets, and GPU-accelerated animations.
 
-**Prerequisites:**  Node.js
+## Tech Stack
 
+* **Framework:** React + Vite
+* **Language:** TypeScript
+* **Styling:** Material UI (MUI) + Emotion
+* **Animation:** Framer Motion
+* **3D Graphics:** Three.js + React Three Fiber
+* **Routing:** React Router DOM
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Running Locally
+
+1.  **Clone the repository**
+    ```bash
+    git clone [https://github.com/yyaahhzxc/portfolio.git](https://github.com/yyaahhzxc/portfolio.git)
+    cd portfolio
+    ```
+
+2.  **Install dependencies**
+    ```bash
+    npm install
+    ```
+
+3.  **Start the development server**
+    ```bash
+    npm run dev
+    ```
+
+## Project Structure
+
+* `/components` - Reusable UI components (BentoGrid, NavBar, Footer, etc.)
+* `/pages` - Main route views (Home, ProjectList, CV)
+* `/public` - Static assets (Images, PDFs, CNAME)
+* `theme.ts` - Custom MUI theme definitions
+
+## License
+
+This project is open source and available under the [MIT License](LICENSE).
