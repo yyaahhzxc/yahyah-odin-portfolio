@@ -1,23 +1,41 @@
-import React, { useState, useRef, Suspense } from 'react';
+import React, { useRef, useMemo, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Points, PointMaterial } from '@react-three/drei';
-// @ts-ignore
-import * as random from 'maath/random/dist/maath-random.esm';
 import { useTheme } from '@mui/material';
+
+// Custom generator to ensure perfect array alignment (Fixes NaN error)
+const generateSphere = (count: number, radius: number) => {
+  const points = new Float32Array(count * 3); // Exact multiple of 3
+  for (let i = 0; i < count; i++) {
+    // Uniform random distribution within a sphere
+    const r = radius * Math.cbrt(Math.random());
+    const theta = Math.random() * 2 * Math.PI;
+    const phi = Math.acos(2 * Math.random() - 1);
+    
+    const x = r * Math.sin(phi) * Math.cos(theta);
+    const y = r * Math.sin(phi) * Math.sin(theta);
+    const z = r * Math.cos(phi);
+    
+    points[i * 3] = x;
+    points[i * 3 + 1] = y;
+    points[i * 3 + 2] = z;
+  }
+  return points;
+};
 
 const Stars = (props: any) => {
   const ref = useRef<any>();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   
-  // Generate 5000 particles in a sphere
-  const [sphere] = useState(() => random.inSphere(new Float32Array(5000), { radius: 1.5 }));
+  // Generate 2000 particles (Safe, performant, and valid)
+  const sphere = useMemo(() => generateSphere(2000, 1.5), []);
 
   useFrame((state, delta) => {
     if (ref.current) {
-      // Rotate the entire cloud slowly
-      ref.current.rotation.x -= delta / 10;
-      ref.current.rotation.y -= delta / 15;
+      // Slow, premium drift rotation
+      ref.current.rotation.x -= delta / 15;
+      ref.current.rotation.y -= delta / 20;
     }
   });
 
@@ -27,7 +45,7 @@ const Stars = (props: any) => {
         <PointMaterial
           transparent
           color={isDark ? "#ffffff" : "#000000"}
-          size={0.002} // Very fine, dust-like size
+          size={0.002} // Very fine, high-end dust size
           sizeAttenuation={true}
           depthWrite={false}
           opacity={isDark ? 0.8 : 0.5}

@@ -12,13 +12,15 @@ import Background3D from './components/Background3D';
 const Home = lazy(() => import('./pages/Home'));
 const CV = lazy(() => import('./pages/CV'));
 const ProjectList = lazy(() => import('./pages/ProjectList'));
-const Lab = lazy(() => import('./pages/Lab')); 
+// Note: Lab is removed
 
 function App() {
   const [mode, setMode] = useState<'light' | 'dark'>('dark');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
-  const location = useLocation(); // This will work now!
+  
+  // Safety check for location (in case Router isn't ready)
+  const location = useLocation(); 
 
   const toggleTheme = () => {
     setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
@@ -28,12 +30,10 @@ function App() {
     setCommandOpen(true);
   };
 
-  // Scroll to top on route change
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location]);
 
-  // Keyboard shortcut for command palette (Ctrl+K)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
@@ -74,7 +74,6 @@ function App() {
       <CustomCursor />
       <Preloader />
       
-      {/* Cinematic 3D Background */}
       <Background3D />
 
       <Box sx={{ position: 'relative', zIndex: 1, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -92,7 +91,6 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/portfolio" element={<ProjectList />} />
               <Route path="/cv" element={<CV />} />
-              <Route path="/lab" element={<Lab />} />
               <Route path="*" element={<Home />} />
             </Routes>
           </Suspense>
