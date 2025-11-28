@@ -1,92 +1,95 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Box, Typography } from '@mui/material';
-import { GlitchText } from './GlitchText';
+import { Box, Typography, useTheme, Theme } from '@mui/material';
 
 export const Preloader = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [counter, setCounter] = useState(0);
+  const theme = useTheme<Theme>();
 
   useEffect(() => {
+    // Check if user has visited this session
     const hasVisited = sessionStorage.getItem('hasVisited');
     if (hasVisited) {
       setIsLoading(false);
       return;
     }
 
-    const interval = setInterval(() => {
-      setCounter((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setTimeout(() => {
-            setIsLoading(false);
-            sessionStorage.setItem('hasVisited', 'true');
-          }, 800);
-          return 100;
-        }
-        return prev + Math.floor(Math.random() * 3) + 1; 
-      });
-    }, 30);
+    // 2.2s timer for the reveal animation
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      sessionStorage.setItem('hasVisited', 'true');
+    }, 2200);
 
-    return () => clearInterval(interval);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
     <AnimatePresence mode="wait">
       {isLoading && (
         <motion.div
-          initial={{ y: 0 }}
+          initial={{ opacity: 1 }}
           exit={{ 
-            y: '-100%', 
+            opacity: 0,
             transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] } 
           }}
           style={{
             position: 'fixed',
             inset: 0,
             zIndex: 99999,
-            backgroundColor: '#0A0B10',
+            // @ts-ignore
+            backgroundColor: theme.palette.background.default,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             flexDirection: 'column',
-            width: '100vw',  // Force full viewport width
-            height: '100vh'
           }}
         >
-          <Box sx={{ width: '100%', textAlign: 'center' }}>
-             <Typography 
-               variant="h1" 
-               sx={{ 
-                 fontSize: { xs: '3rem', md: '6rem' }, 
-                 color: '#fff', 
-                 fontWeight: 700, 
-                 lineHeight: 1,
-                 fontFamily: '"Space Grotesk", sans-serif',
-                 display: 'block',
-                 textAlign: 'center'
-               }}
+          <Box sx={{ overflow: 'hidden', textAlign: 'center' }}>
+             {/* NAME REVEAL (Slide Up) */}
+             <motion.div
+               initial={{ y: 40, opacity: 0 }}
+               animate={{ y: 0, opacity: 1 }}
+               transition={{ duration: 1, ease: "easeOut" }}
              >
-                {Math.min(counter, 100)}%
-             </Typography>
-          
-             <Typography 
-                component="div" // Ensure block display for centering
-                variant="overline" 
-                sx={{ 
-                  color: 'rgba(255,255,255,0.5)', 
-                  letterSpacing: '0.2em',
-                  fontFamily: '"Space Grotesk", sans-serif',
-                  mt: 1,
-                  textAlign: 'center',
-                  width: '100%'
-                }}
+               <Typography 
+                 variant="h1" 
+                 sx={{ 
+                   fontSize: { xs: '2.5rem', md: '5rem' }, 
+                   fontWeight: 800, 
+                   letterSpacing: '-0.02em',
+                   fontFamily: '"Space Grotesk", sans-serif',
+                   // Use the custom gradient
+                   // @ts-ignore
+                   background: theme.custom?.iridescentGradient || theme.palette.primary.main,
+                   WebkitBackgroundClip: 'text',
+                   WebkitTextFillColor: 'transparent',
+                   filter: 'drop-shadow(0 0 20px rgba(255,255,255,0.2))'
+                 }}
+               >
+                  Yahyah Odin
+               </Typography>
+             </motion.div>
+
+             {/* SUBTITLE FADE IN */}
+             <motion.div
+               initial={{ opacity: 0 }}
+               animate={{ opacity: 1 }}
+               transition={{ delay: 0.5, duration: 0.8 }}
              >
-                {counter < 100 ? (
-                    <GlitchText text="SYSTEM INITIALIZING..." speed={50} />
-                ) : (
-                    <GlitchText text="ACCESS GRANTED" speed={50} />
-                )}
-             </Typography>
+                <Typography 
+                    variant="overline" 
+                    sx={{ 
+                      color: 'text.secondary', 
+                      letterSpacing: '0.3em',
+                      mt: 2,
+                      display: 'block',
+                      fontSize: '0.9rem',
+                      fontWeight: 600
+                    }}
+                >
+                    PORTFOLIO 2025
+                </Typography>
+             </motion.div>
           </Box>
         </motion.div>
       )}

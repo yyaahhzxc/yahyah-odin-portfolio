@@ -4,7 +4,6 @@ import { Box, IconButton, AppBar, Toolbar, Container, useMediaQuery, useTheme, T
 import { DarkMode, LightMode, Menu as MenuIcon, Close as CloseIcon } from '@mui/icons-material';
 import { AnimatePresence, motion, useScroll, useSpring } from 'framer-motion';
 import { Magnetic } from './Magnetic';
-import { GlitchText } from './GlitchText';
 
 interface NavBarProps {
   toggleTheme: () => void;
@@ -26,7 +25,6 @@ export const NavBar: React.FC<NavBarProps> = ({ toggleTheme, mode, mobileOpen, s
     restDelta: 0.001
   });
 
-  // UPDATED: "Résumé" -> "Profile"
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Portfolio', path: '/portfolio' },
@@ -64,10 +62,12 @@ export const NavBar: React.FC<NavBarProps> = ({ toggleTheme, mode, mobileOpen, s
                 fontFamily: 'Space Grotesk', 
                 fontSize: '1.1rem',
                 letterSpacing: '-0.02em',
-                display: 'inline-block'
+                display: 'inline-block',
+                transition: 'opacity 0.2s',
+                '&:hover': { opacity: 0.7 }
               }}
             >
-              <GlitchText text="yahyah-odin.is-a.dev" />
+              yahyah-odin.is-a.dev
             </Box>
           </Magnetic>
 
@@ -139,6 +139,7 @@ export const NavBar: React.FC<NavBarProps> = ({ toggleTheme, mode, mobileOpen, s
           left: 0,
           right: 0,
           height: '2px',
+          // @ts-ignore
           background: theme.custom?.iridescentGradient || theme.palette.primary.main,
           transformOrigin: '0%',
           zIndex: 1200

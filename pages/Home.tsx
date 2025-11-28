@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Box, Typography, Chip, Stack, Avatar, Button, Grid, useMediaQuery, useTheme, Theme, Snackbar } from '@mui/material';
 import { BentoGrid, BentoTile } from '../components/BentoGrid';
 import { Magnetic } from '../components/Magnetic';
-import { GlitchText } from '../components/GlitchText';
 import { useNavigate } from 'react-router-dom';
 import { motion, Variants, AnimatePresence, LayoutGroup } from 'framer-motion';
-// FIX: Added missing imports for social icons
 import { 
   Brush, GitHub, LinkedIn, AutoAwesome, Email, Terminal, Facebook, Storage, Description, Settings, Group
 } from '@mui/icons-material';
@@ -57,6 +55,7 @@ const workImages = [
   '/Thumbnails/Palaro 2025 Recruitment Boosting PubMats_page1.webp'
 ];
 
+// ADDED MISSING VARIABLE
 const timelineItems = [
   { year: '2025', label: 'Cluster Head' },
   { year: '2024', label: 'Associate EVP' },
@@ -80,6 +79,7 @@ const ROLES = [
 // Animated Profile Picture Component
 const ProfileAnimation = () => {
   const [index, setIndex] = useState(0);
+  const theme = useTheme<Theme>(); 
   const images = ["/Pictures/odin_formal.jpg", "/Pictures/odin_informal.jpg"]; 
 
   useEffect(() => {
@@ -90,31 +90,57 @@ const ProfileAnimation = () => {
   }, [images.length]);
 
   return (
-    <Box sx={{ position: 'relative', width: { xs: 120, md: 160 }, height: { xs: 120, md: 160 }, flexShrink: 0 }}>
-      <AnimatePresence mode="popLayout">
-        <motion.div
-          key={index}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 1.5 }}
-          style={{ position: 'absolute', inset: 0 }}
-        >
-          <Avatar 
-            src={images[index]} 
-            sx={{ 
-                width: '100%', 
-                height: '100%', 
-                border: '4px solid', 
-                borderColor: 'background.paper', 
-                bgcolor: 'primary.main',
-                fontSize: '3.5rem' 
-            }}
-          >
-            YO
-          </Avatar>
-        </motion.div>
-      </AnimatePresence>
+    <Box 
+        sx={{ 
+            position: 'relative', 
+            width: { xs: 120, md: 160 }, 
+            height: { xs: 120, md: 160 }, 
+            flexShrink: 0,
+            borderRadius: '50%',
+            cursor: 'pointer',
+            '&::before': {
+                content: '""',
+                position: 'absolute',
+                inset: '-4px',
+                borderRadius: '50%',
+                // @ts-ignore
+                background: theme.custom?.borderGradient || theme.palette.primary.main,
+                animation: 'spinBorder 4s linear infinite',
+                zIndex: 0,
+                opacity: 0,
+                transition: 'opacity 0.3s ease',
+            },
+            '&:hover::before': {
+                opacity: 1,
+            }
+        }}
+    >
+      <Box sx={{ position: 'absolute', inset: 0, bgcolor: 'background.paper', borderRadius: '50%', zIndex: 1 }} />
+
+      <Box sx={{ position: 'relative', zIndex: 2, width: '100%', height: '100%', overflow: 'hidden', borderRadius: '50%' }}>
+          <AnimatePresence mode="popLayout">
+            <motion.div
+            key={index}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.5 }}
+            style={{ position: 'absolute', inset: 0 }}
+            >
+            <Avatar 
+                src={images[index]} 
+                sx={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    bgcolor: 'primary.main',
+                    fontSize: '3.5rem' 
+                }}
+            >
+                YO
+            </Avatar>
+            </motion.div>
+        </AnimatePresence>
+      </Box>
     </Box>
   );
 };
@@ -148,7 +174,6 @@ export default function Home() {
     }
   };
 
-  // Handler to open the CV PDF
   const handleViewCV = () => {
       window.open('/CV/Odin_CV.pdf', '_blank');
   };
@@ -160,6 +185,8 @@ export default function Home() {
         exit="exit" 
         variants={{ visible: { transition: { staggerChildren: 0.15 } } }}
     >
+      <Box className="noise-overlay" />
+
       <Box sx={{ maxWidth: '1600px', margin: '0 auto', px: { xs: 2, md: 6 }, position: 'relative', zIndex: 1, py: 2 }}>
         <BentoGrid>
           
@@ -168,12 +195,12 @@ export default function Home() {
             <BentoTile alwaysActive sx={{ minHeight: { xs: 'auto', md: '260px' }, display: 'flex', alignItems: 'center', background: theme.palette.background.paper, py: { xs: 4, md: 0 } }}>
                <Box sx={{ display: 'flex', width: '100%', height: '100%', alignItems: 'center', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 3, md: 4 }, px: 2 }}>
                   
-                  {/* ANIMATED PROFILE PICTURE */}
                   <ProfileAnimation />
 
                   <Box sx={{ flexGrow: 1, width: '100%', textAlign: { xs: 'center', md: 'left' }, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: { xs: 'center', md: 'flex-start' } }}>
                     <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: 'center', justifyContent: 'space-between', width: '100%', mb: 1, flexWrap: 'wrap', gap: 1 }}>
                         <Box component={motion.div} variants={textContainer} initial="hidden" animate="visible">
+                          {/* LIQUID GRADIENT TEXT */}
                           <Typography 
                             variant="h1" 
                             sx={{ 
@@ -189,7 +216,7 @@ export default function Home() {
                                 filter: isDark ? 'drop-shadow(0 0 10px rgba(0, 229, 255, 0.5))' : 'none'
                             }}
                           >
-                              <GlitchText text="Yahyah Odin" />
+                              Yahyah Odin
                           </Typography>
                         </Box>
                         <Typography variant="h4" color="text.secondary" sx={{ fontWeight: 600, opacity: 0.6, ml: { xs: 0, md: 'auto' } }}>Davao City, PH</Typography>

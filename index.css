@@ -1,155 +1,69 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --noise-color: rgba(0, 0, 0, 0.04);
+  font-family: 'Outfit', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light dark;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --noise-color: rgba(255, 255, 255, 0.03);
-  }
-}
-
-html {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(125, 125, 125, 0.3) transparent;
-}
-
-/* Hide cursor on desktop to use custom cursor */
-@media (hover: hover) and (pointer: fine) {
-  body, a, button, [role="button"] {
-    cursor: none !important;
-  }
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
 }
 
 body {
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-  background-color: transparent; /* Handled by theme & background components */
+  background-color: #050505;
+  transition: background-color 0.3s ease;
 }
 
-/* Ambient Background - Lower z-index to sit behind 3D canvas */
-.aurora-bg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: -2;
-  overflow: hidden;
-  background: var(--bg-color);
-  opacity: 0.6; /* Slight fade to allow 3D particles to pop */
+/* --- ANTI-AI POLISH: Custom Selection Color --- */
+::selection {
+  background: #D946EF; /* Brand Pink */
+  color: white;
 }
 
-.aurora-blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.4;
-  animation: float 20s infinite ease-in-out alternate;
+/* --- ANTI-AI POLISH: Custom Scrollbar --- */
+::-webkit-scrollbar {
+  width: 8px;
 }
 
-.blob-1 {
-  top: -10%;
-  left: -10%;
-  width: 50vw;
-  height: 50vw;
-  background: radial-gradient(circle, rgba(0, 201, 255, 0.4) 0%, rgba(0, 0, 0, 0) 70%);
-  animation-delay: 0s;
+::-webkit-scrollbar-track {
+  background: transparent; 
 }
 
-.blob-2 {
-  bottom: -10%;
-  right: -10%;
-  width: 60vw;
-  height: 60vw;
-  background: radial-gradient(circle, rgba(255, 0, 204, 0.3) 0%, rgba(0, 0, 0, 0) 70%);
-  animation-delay: -5s;
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 100, 100, 0.3); 
+  border-radius: 10px;
+  transition: background 0.2s;
 }
 
-.blob-3 {
-  top: 40%;
-  left: 40%;
-  width: 40vw;
-  height: 40vw;
-  background: radial-gradient(circle, rgba(146, 254, 157, 0.2) 0%, rgba(0, 0, 0, 0) 70%);
-  animation-delay: -10s;
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 100, 100, 0.6); 
 }
 
-/* Noise Overlay on top of Aurora */
+/* --- ANTI-AI POLISH: Noise Texture Overlay --- */
 .noise-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: -2; /* Matches aurora level */
   pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+  z-index: 9998;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
-@keyframes float {
-  0% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30px, 50px) scale(1.1); }
-  66% { transform: translate(-20px, 20px) scale(0.9); }
-  100% { transform: translate(0, 0) scale(1); }
-}
-
-/* Shimmer Effect for Status Badge */
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(125, 125, 125, 0.3);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(125, 125, 125, 0.5);
-}
-
-/* Infinite Scroll Animation */
-@keyframes scroll-left {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-@keyframes scroll-right {
-  0% { transform: translateX(-50%); }
-  100% { transform: translateX(0); }
-}
-
-.scroll-content {
-  display: flex;
-  gap: 1rem;
-  width: max-content;
-}
-
-.animate-scroll-left {
-  animation: scroll-left 30s linear infinite;
-}
-
-.animate-scroll-right {
-  animation: scroll-right 30s linear infinite;
-}
-
-.scroll-container:hover .animate-scroll-left,
-.scroll-container:hover .animate-scroll-right {
-  animation-play-state: paused;
-}
-
-/* Lock body scroll */
-.no-scroll {
-  overflow: hidden !important;
+/* Utility for Text Balancing */
+.text-balance {
+  text-wrap: balance;
 }
