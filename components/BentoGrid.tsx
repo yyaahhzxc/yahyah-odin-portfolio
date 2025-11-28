@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Card, Typography, Grid, useTheme, Theme } from '@mui/material';
-import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface BentoTileProps {
   children: React.ReactNode;
@@ -15,7 +15,6 @@ interface BentoTileProps {
   sx?: any;
 }
 
-// FIX: Use motion.create()
 const MotionCard = motion.create(Card);
 
 export const BentoTile: React.FC<BentoTileProps> = ({ 
@@ -30,23 +29,10 @@ export const BentoTile: React.FC<BentoTileProps> = ({
   alwaysActive,
   sx = {}
 }) => {
-  const theme = useTheme<Theme>(); 
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  function handleMouseMove({ currentTarget, clientX, clientY }: React.MouseEvent) {
-    const { left, top } = currentTarget.getBoundingClientRect();
-    mouseX.set(clientX - left);
-    mouseY.set(clientY - top);
-  }
-
-  const spotlightColor = theme.palette.mode === 'dark' 
-    ? 'rgba(255, 255, 255, 0.1)' 
-    : 'rgba(0, 0, 0, 0.05)';
+  const theme = useTheme<Theme>();
 
   return (
     <MotionCard
-      onMouseMove={handleMouseMove}
       variants={{
         hidden: { opacity: 0, y: 20 },
         visible: { opacity: 1, y: 0 }
@@ -60,11 +46,15 @@ export const BentoTile: React.FC<BentoTileProps> = ({
         flexDirection: 'column',
         position: 'relative', 
         cursor: (link || onClick) ? 'pointer' : 'default',
-        background: background,
+        // Use transparent background to let the inner box handle the color
+        background: 'transparent', 
         overflow: 'hidden', 
+        padding: '3px', // Space for the border
+        borderRadius: '24px', // Outer radius
+        boxShadow: 'none', // Remove default shadow
         ...sx,
         
-        // ROTATING BORDER LAYER
+        // ROTATING BORDER LAYER (Consistent with ProjectList)
         '&::before': {
             content: '""',
             position: 'absolute',
@@ -74,69 +64,59 @@ export const BentoTile: React.FC<BentoTileProps> = ({
             top: '50%',
             marginLeft: '-75vmax',
             marginTop: '-75vmax', 
-            background: theme.custom.borderGradient,
+            // @ts-ignore
+            background: theme.custom?.borderGradient || theme.palette.primary.main,
             animation: 'spinBorder 4s linear infinite', 
             zIndex: 0,
-            opacity: alwaysActive ? 1 : 0,
+            opacity: alwaysActive ? 1 : 0, // Always show if active
             transition: 'opacity 0.3s ease',
         },
-        // INNER MASK
-        '&::after': {
-             content: '""',
-             position: 'absolute',
-             inset: '2px', 
-             borderRadius: '22px',
-             background: background || theme.palette.background.paper,
-             zIndex: 0,
-        },
-        
-        '&:hover::before, &:active::before, &:focus-within::before': {
+        // Hover state for border
+        '&:hover::before': {
             opacity: 1,
         }
       }}
     >
-      {/* Spotlight Effect */}
-      <motion.div
-        className="pointer-events-none absolute -inset-px opacity-0 transition duration-300 group-hover:opacity-100"
-        style={{
-          background: useMotionTemplate`
-            radial-gradient(
-              650px circle at ${mouseX}px ${mouseY}px,
-              ${spotlightColor},
-              transparent 80%
-            )
-          `,
-          position: 'absolute',
-          inset: 0,
-          pointerEvents: 'none',
-          zIndex: 1
+      {/* INNER CARD CONTENT (The actual card background) */}
+      <Box 
+        sx={{ 
+            flex: 1,
+            background: background || theme.palette.background.paper,
+            borderRadius: '21px', // Inner radius (Outer - padding)
+            position: 'relative',
+            zIndex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            p: 3,
+            height: '100%',
+            overflow: 'hidden'
         }}
-      />
+      >
+          {/* Gradient Top Line (Optional, kept for continuity) */}
+          {gradient && !alwaysActive && (
+             <Box sx={{
+               position: 'absolute',
+               top: 0,
+               left: 0,
+               right: 0,
+               height: '4px',
+               // @ts-ignore
+               background: theme.custom?.iridescentGradient,
+               zIndex: 2
+             }} />
+          )}
 
-      {gradient && !alwaysActive && (
-         <Box sx={{
-           position: 'absolute',
-           top: 0,
-           left: 0,
-           right: 0,
-           height: '4px',
-           background: theme.custom.iridescentGradient,
-           zIndex: 2
-         }} />
-      )}
-
-      <Box sx={{ p: 3, flex: 1, display: 'flex', flexDirection: 'column', position: 'relative', zIndex: 2, height: '100%' }}>
-        {(title || icon) && (
-            <Box sx={{ mb: 2 }}>
-                {icon && <Box sx={{ mb: 1.5, color: 'text.primary' }}>{icon}</Box>}
-                {title && <Typography variant="h6" color="text.secondary" sx={{ opacity: 0.8, fontSize: '0.85rem', letterSpacing: '0.05em', textTransform: 'uppercase' }}>{title}</Typography>}
-                {subtitle && <Typography variant="h3" sx={{ mt: 0.5 }}>{subtitle}</Typography>}
-            </Box>
-        )}
-        
-        <Box sx={{ flex: 1, width: '100%' }}>
-          {children}
-        </Box>
+          {(title || icon) && (
+              <Box sx={{ mb: 2 }}>
+                  {icon && <Box sx={{ mb: 1.5, color: 'text.primary' }}>{icon}</Box>}
+                  {title && <Typography variant="h6" color="text.secondary" sx={{ opacity: 0.8, fontSize: '0.85rem', letterSpacing: '0.05em', textTransform: 'uppercase' }}>{title}</Typography>}
+                  {subtitle && <Typography variant="h3" sx={{ mt: 0.5 }}>{subtitle}</Typography>}
+              </Box>
+          )}
+          
+          <Box sx={{ flex: 1, width: '100%' }}>
+            {children}
+          </Box>
       </Box>
     </MotionCard>
   );
