@@ -7,14 +7,12 @@ export const Preloader = () => {
   const theme = useTheme<Theme>();
 
   useEffect(() => {
-    // Check if user has visited this session
     const hasVisited = sessionStorage.getItem('hasVisited');
     if (hasVisited) {
       setIsLoading(false);
       return;
     }
 
-    // 2.2s timer for the reveal animation
     const timer = setTimeout(() => {
       setIsLoading(false);
       sessionStorage.setItem('hasVisited', 'true');
@@ -45,7 +43,6 @@ export const Preloader = () => {
           }}
         >
           <Box sx={{ overflow: 'hidden', textAlign: 'center' }}>
-             {/* NAME REVEAL (Slide Up) */}
              <motion.div
                initial={{ y: 40, opacity: 0 }}
                animate={{ y: 0, opacity: 1 }}
@@ -58,19 +55,17 @@ export const Preloader = () => {
                    fontWeight: 800, 
                    letterSpacing: '-0.02em',
                    fontFamily: '"Space Grotesk", sans-serif',
-                   // Use the custom gradient
                    // @ts-ignore
                    background: theme.custom?.iridescentGradient || theme.palette.primary.main,
                    WebkitBackgroundClip: 'text',
                    WebkitTextFillColor: 'transparent',
-                   filter: 'drop-shadow(0 0 20px rgba(255,255,255,0.2))'
+                   filter: 'drop-shadow(0 0 15px rgba(255,255,255,0.3))'
                  }}
                >
                   Yahyah Odin
                </Typography>
              </motion.div>
 
-             {/* SUBTITLE FADE IN */}
              <motion.div
                initial={{ opacity: 0 }}
                animate={{ opacity: 1 }}

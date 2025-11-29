@@ -1,46 +1,36 @@
-
 import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 
-interface MagneticProps {
-  children: React.ReactElement;
-  strength?: number; // How far the element moves (default 0.2)
-}
-
-export const Magnetic: React.FC<MagneticProps> = ({ children, strength = 0.2 }) => {
+export const Magnetic = ({ children, strength = 0.2 }: { children: React.ReactNode; strength?: number }) => {
   const ref = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouse = (e: React.MouseEvent) => {
     const { clientX, clientY } = e;
-    // @ts-ignore
-    const { height, width, left, top } = ref.current.getBoundingClientRect();
+    const { height, width, left, top } = ref.current!.getBoundingClientRect();
     
     const middleX = clientX - (left + width / 2);
     const middleY = clientY - (top + height / 2);
-
+    
     setPosition({ x: middleX * strength, y: middleY * strength });
   };
 
-  const handleMouseLeave = () => {
+  const reset = () => {
     setPosition({ x: 0, y: 0 });
   };
 
   const { x, y } = position;
-
+  
   return (
     <motion.div
+      style={{ position: 'relative', display: 'inline-block' }}
       ref={ref}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
+      onMouseMove={handleMouse}
+      onMouseLeave={reset}
       animate={{ x, y }}
-      transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
-      style={{ display: 'inline-block' }}
+      transition={{ type: 'spring', stiffness: 150, damping: 15, mass: 0.1 }}
     >
-      {React.cloneElement(children, {
-        // Ensure the child doesn't block pointer events if needed, 
-        // though typically we want the interaction on the wrapper.
-      })}
+      {children}
     </motion.div>
   );
 };

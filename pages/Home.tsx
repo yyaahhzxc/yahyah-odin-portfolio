@@ -5,7 +5,7 @@ import { Magnetic } from '../components/Magnetic';
 import { useNavigate } from 'react-router-dom';
 import { motion, Variants, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { 
-  Brush, GitHub, LinkedIn, AutoAwesome, Email, Terminal, Facebook, Storage, Description, Settings, Group
+  Brush, GitHub, LinkedIn, Email, Terminal, Facebook, Settings, Group
 } from '@mui/icons-material';
 
 const textContainer: Variants = {
@@ -43,7 +43,6 @@ const skillCategories = [
   { name: 'Functional', icon: <Group fontSize="inherit" />, skills: ['Leadership', 'Project Mgmt', 'Tech Writing'] },
 ];
 
-// UPDATED WORK IMAGES FOR MARQUEE
 const workImages = [
   '/Thumbnails/ACES DOTA 2 Postings_compress-page01.webp',
   '/Thumbnails/BAHAGHARI Vivant - General Assembly Presentation Slides_page1.webp',
@@ -55,7 +54,6 @@ const workImages = [
   '/Thumbnails/Palaro 2025 Recruitment Boosting PubMats_page1.webp'
 ];
 
-// ADDED MISSING VARIABLE
 const timelineItems = [
   { year: '2025', label: 'Cluster Head' },
   { year: '2024', label: 'Associate EVP' },
@@ -76,7 +74,6 @@ const ROLES = [
 
 // --- COMPONENTS ---
 
-// Animated Profile Picture Component
 const ProfileAnimation = () => {
   const [index, setIndex] = useState(0);
   const theme = useTheme<Theme>(); 
@@ -153,7 +150,6 @@ export default function Home() {
   const [toastOpen, setToastOpen] = useState(false);
   const [roleIndex, setRoleIndex] = useState(0);
 
-  // Seamless looping gradient
   const textGradient = isDark 
     ? 'linear-gradient(to right, #4C1D95, #3B82F6, #00E5FF, #4C1D95)' 
     : 'linear-gradient(to right, #F472B6, #A78BFA, #22D3EE, #F472B6)';
@@ -192,7 +188,8 @@ export default function Home() {
           
           {/* --- ROW 1: PROFILE BANNER --- */}
           <Grid item xs={12} md={12} component={motion.div} variants={slideDown}>
-            <BentoTile alwaysActive sx={{ minHeight: { xs: 'auto', md: '260px' }, display: 'flex', alignItems: 'center', background: theme.palette.background.paper, py: { xs: 4, md: 0 } }}>
+            {/* Removed extra styling overrides that broke the border */}
+            <BentoTile alwaysActive sx={{ minHeight: { xs: 'auto', md: '260px' }, background: theme.palette.background.paper }}>
                <Box sx={{ display: 'flex', width: '100%', height: '100%', alignItems: 'center', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 3, md: 4 }, px: 2 }}>
                   
                   <ProfileAnimation />
@@ -200,7 +197,6 @@ export default function Home() {
                   <Box sx={{ flexGrow: 1, width: '100%', textAlign: { xs: 'center', md: 'left' }, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: { xs: 'center', md: 'flex-start' } }}>
                     <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: 'center', justifyContent: 'space-between', width: '100%', mb: 1, flexWrap: 'wrap', gap: 1 }}>
                         <Box component={motion.div} variants={textContainer} initial="hidden" animate="visible">
-                          {/* LIQUID GRADIENT TEXT */}
                           <Typography 
                             variant="h1" 
                             sx={{ 
@@ -262,7 +258,22 @@ export default function Home() {
 
           {/* CENTER CARD */}
           <Grid item xs={12} md={4} component={motion.div} variants={slideUp}>
-            <BentoTile sx={{ height: '100%', minHeight: '340px', background: theme.custom?.iridescentGradient || theme.palette.primary.main, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: 'none', boxShadow: isDark ? '0 20px 50px -10px rgba(0, 229, 255, 0.3)' : '0 20px 50px -10px rgba(217, 70, 239, 0.3)' }}>
+            <BentoTile 
+                borderless // Added borderless explicitly
+                sx={{ 
+                    height: '100%', 
+                    minHeight: '340px', 
+                    // @ts-ignore
+                    background: theme.custom?.iridescentGradient || theme.palette.primary.main, 
+                    textAlign: 'center', 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    border: 'none', // Ensure no default border
+                    boxShadow: isDark ? '0 20px 50px -10px rgba(0, 229, 255, 0.3)' : '0 20px 50px -10px rgba(217, 70, 239, 0.3)' 
+                }}
+            >
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', px: 2 }}>
                     <LayoutGroup>
                         <motion.div layout style={{ marginBottom: '16px' }}>
@@ -358,7 +369,7 @@ export default function Home() {
           
           {/* VIEW CV */}
           <Grid item xs={12} md={4} component={motion.div} variants={slideRight}>
-             <BentoTile onClick={handleViewCV} sx={{ background: theme.palette.background.paper, border: '1px solid', borderColor: 'divider', height: '100%', minHeight: '280px', overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+             <BentoTile onClick={handleViewCV} sx={{ background: theme.palette.background.paper, height: '100%', minHeight: '280px', overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Box sx={{ position: 'absolute', inset: 0, overflow: 'hidden', opacity: 0.25, maskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)', display: 'flex', alignItems: 'center', zIndex: 0 }}>
                     <motion.div 
                         animate={{ x: ["0%", "-50%"] }} 
@@ -396,7 +407,7 @@ export default function Home() {
                      overflow: 'hidden', 
                      display: 'flex', 
                      alignItems: 'stretch',
-                     pl: 0 
+                     // FIX: Removed pl: 0 from container to preserve border
                  }}
              >
                 <Box sx={{ position: 'absolute', top: 0, left: 0, width: '200%', height: '100%', opacity: 0.3, display: 'flex', maskImage: 'linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)' }}>
@@ -406,11 +417,13 @@ export default function Home() {
                         style={{ display: 'flex', width: '100%' }} 
                     >
                         {[...workImages, ...workImages].map((img, i) => (
+                            // @ts-ignore
                             <Box key={i} component="img" src={img} sx={{ width: '12.5%', height: '100%', objectFit: 'cover', filter: 'grayscale(100%)', opacity: 0.7 }} />
                         ))}
                     </motion.div>
                 </Box>
                 
+                {/* Inner content with negative margin to flush images if desired, or standard padding */}
                 <Box sx={{ position: 'relative', zIndex: 2, width: '100%', pointerEvents: 'none', px: 0, pt: 4, pb: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                    <Typography variant="h2" sx={{ opacity: 1, mb: 2, fontWeight: 800 }}>Explore Selected Projects</Typography>
                    <Button sx={{ 
@@ -432,7 +445,7 @@ export default function Home() {
         </BentoGrid>
       </Box>
 
-      {/* TOAST NOTIFICATION */}
+      {/* Toast Notification */}
       <Snackbar 
         open={toastOpen} 
         autoHideDuration={3000} 

@@ -3,7 +3,6 @@ import { Box, Typography, Container, Stack, Avatar, Grid, Button, useTheme, Them
 import { motion, AnimatePresence } from 'framer-motion';
 import { Download, Email, Phone, LocationOn, School, Star, Group, Handyman, Business, EmojiEvents, Badge } from '@mui/icons-material';
 import { Footer } from '../components/Footer';
-import { GlitchText } from '../components/GlitchText';
 import { Magnetic } from '../components/Magnetic';
 
 // --- ANIMATION VARIANTS ---
@@ -17,7 +16,7 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 }
 };
 
-// --- DATA FROM PDF ---
+// --- DATA ---
 
 // 1. EDUCATION
 const education = [
@@ -221,6 +220,27 @@ const skills = {
 };
 
 // --- COMPONENTS ---
+
+// Custom "Skill Pill" style
+const skillPillStyle = (theme: Theme) => ({
+    px: 2,
+    py: 1,
+    borderRadius: '12px',
+    border: '1px solid',
+    borderColor: 'divider',
+    bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+    color: 'text.primary',
+    fontSize: '0.9rem',
+    fontWeight: 500,
+    fontFamily: 'Space Grotesk',
+    transition: 'all 0.2s ease',
+    '&:hover': {
+        borderColor: 'primary.main',
+        bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
+        transform: 'translateY(-2px)'
+    }
+});
+
 const TimelineItem = ({ title, subtitle, period, description }: any) => {
     const theme = useTheme<Theme>();
     return (
@@ -229,27 +249,31 @@ const TimelineItem = ({ title, subtitle, period, description }: any) => {
             variants={itemVariants}
             sx={{ position: 'relative', pl: 4, pb: 6, '&:last-child': { pb: 0 } }}
         >
+            {/* Continuous Vertical Line */}
             <Box 
                 sx={{ 
                     position: 'absolute', 
                     left: '7px', 
-                    top: '8px', 
-                    bottom: 0, 
+                    top: '20px', 
+                    bottom: -6, 
                     width: '2px', 
-                    bgcolor: 'divider' 
+                    bgcolor: 'divider',
+                    '.MuiBox-root:last-child > &': { display: 'none' } 
                 }} 
             />
+            {/* Dot */}
             <Box 
                 sx={{ 
                     position: 'absolute', 
                     left: 0, 
-                    top: '8px', 
+                    top: '4px', 
                     width: '16px', 
                     height: '16px', 
                     borderRadius: '50%', 
                     // @ts-ignore
                     background: theme.custom?.iridescentGradient || theme.palette.primary.main,
-                    boxShadow: theme.palette.mode === 'dark' ? '0 0 12px rgba(0, 229, 255, 0.5)' : '0 0 12px rgba(217, 70, 239, 0.5)'
+                    boxShadow: theme.palette.mode === 'dark' ? '0 0 12px rgba(0, 229, 255, 0.5)' : '0 0 12px rgba(217, 70, 239, 0.5)',
+                    zIndex: 1
                 }} 
             />
             
@@ -275,9 +299,9 @@ export default function CV() {
   
   const [activeTab, setActiveTab] = useState('Education');
   const [hoveredTab, setHoveredTab] = useState<string | null>(null);
+  
   const tabs = ['Education', 'Affiliations', 'Awards', 'Experience', 'Skills'];
 
-  // Tabs Animation State
   const [pillStyle, setPillStyle] = useState({ left: 0, top: 0, width: 0, height: 0, opacity: 0 });
   const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
 
@@ -305,39 +329,48 @@ export default function CV() {
       <Container maxWidth="lg" sx={{ pt: { xs: 4, md: 8 }, pb: 8 }}>
           <Grid container spacing={8}>
               
-              {/* SIDEBAR (Fixed Info) */}
+              {/* SIDEBAR */}
               <Grid item xs={12} md={4}>
                   <Box sx={{ position: { md: 'sticky' }, top: 100, textAlign: { xs: 'center', md: 'left' } }}>
                       
                       {/* ANIMATED PROFILE PICTURE */}
                       <Box sx={{ position: 'relative', display: 'inline-block', mb: 3 }}>
-                        <Box
-                            sx={{
-                                position: 'absolute',
-                                inset: '-4px',
-                                borderRadius: '50%',
-                                // @ts-ignore
-                                background: theme.custom?.borderGradient || theme.palette.primary.main,
-                                animation: 'spinBorder 4s linear infinite',
-                                zIndex: 0,
-                                opacity: 0,
-                                transition: 'opacity 0.3s ease',
-                                '.profile-container:hover &': { opacity: 1 }
+                         <Box 
+                            className="profile-wrapper"
+                            sx={{ 
+                                position: 'relative', 
+                                display: 'inline-block',
+                                '&:hover .border-glow': { opacity: 1 }
                             }}
-                        />
-                        <Box className="profile-container" sx={{ position: 'relative', zIndex: 1, borderRadius: '50%', bgcolor: 'background.paper' }}>
-                            <Avatar 
-                                src="/Pictures/odin_formal.jpg" 
-                                sx={{ 
-                                    width: 200, 
-                                    height: 200, 
-                                    border: '4px solid', 
-                                    borderColor: 'background.paper',
-                                    bgcolor: 'primary.main',
-                                    fontSize: '4rem',
-                                }} 
-                            >YO</Avatar>
-                        </Box>
+                         >
+                             <Box 
+                                className="border-glow"
+                                sx={{
+                                    position: 'absolute',
+                                    inset: '-4px',
+                                    borderRadius: '50%',
+                                    // @ts-ignore
+                                    background: theme.custom?.borderGradient || theme.palette.primary.main,
+                                    animation: 'spinBorder 4s linear infinite',
+                                    zIndex: 0,
+                                    opacity: 0,
+                                    transition: 'opacity 0.3s ease',
+                                }}
+                             />
+                             <Box sx={{ position: 'relative', zIndex: 1, borderRadius: '50%', bgcolor: 'background.paper' }}>
+                                <Avatar 
+                                    src="/Pictures/odin_formal.jpg" 
+                                    sx={{ 
+                                        width: 200, 
+                                        height: 200, 
+                                        border: '4px solid', 
+                                        borderColor: 'background.paper',
+                                        bgcolor: 'primary.main',
+                                        fontSize: '4rem',
+                                    }} 
+                                >YO</Avatar>
+                             </Box>
+                         </Box>
                       </Box>
                       
                       <Typography variant="h3" sx={{ fontWeight: 800, mb: 1, letterSpacing: '-0.02em' }}>
@@ -383,7 +416,7 @@ export default function CV() {
               {/* MAIN CONTENT AREA */}
               <Grid item xs={12} md={8}>
                  
-                 {/* STYLED TABS (Pill Style) */}
+                 {/* TABS */}
                  <Box sx={{ display: 'flex', justifyContent: { xs: 'center', md: 'flex-start' }, mb: 6 }} onMouseLeave={() => setHoveredTab(null)}>
                      <Box 
                         sx={{ 
@@ -394,11 +427,10 @@ export default function CV() {
                             borderRadius: '50px',
                             border: '1px solid',
                             borderColor: 'divider',
-                            flexWrap: 'wrap', // Mobile wrapping support
+                            flexWrap: 'wrap', 
                             justifyContent: 'center'
                         }}
                      >
-                        {/* Active Pill */}
                         <Box
                             component={motion.div}
                             animate={pillStyle}
@@ -406,7 +438,6 @@ export default function CV() {
                             transition={{ type: "spring", stiffness: 250, damping: 25 }}
                             sx={{
                                 position: 'absolute',
-                                // Top/Left/Height/Width handled by state
                                 bgcolor: isDark ? 'rgba(255,255,255,0.2)' : 'background.paper',
                                 borderRadius: '50px',
                                 boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
@@ -422,7 +453,7 @@ export default function CV() {
                             return (
                                 <ButtonBase
                                     key={tab}
-                                    ref={el => tabsRef.current[index] = el}
+                                    ref={(el: HTMLButtonElement | null) => { tabsRef.current[index] = el; }}
                                     disableRipple
                                     onClick={() => { if (activeTab !== tab) setActiveTab(tab); }}
                                     onMouseEnter={() => setHoveredTab(tab)}
@@ -442,7 +473,6 @@ export default function CV() {
                                         whiteSpace: 'nowrap'
                                     }}
                                 >
-                                    {/* HOVER PILL */}
                                     {isHovered && !isSelected && (
                                         <Box 
                                             component={motion.div}
@@ -467,7 +497,7 @@ export default function CV() {
                      </Box>
                  </Box>
 
-                 {/* CONTENT SWITCHER */}
+                 {/* CONTENT */}
                  <AnimatePresence mode="wait">
                      <motion.div
                         key={activeTab}
@@ -512,23 +542,24 @@ export default function CV() {
                                     </Typography>
                                     {education.map((edu, i) => (
                                         <Box key={i} sx={{ mb: 4, pl: 4, position: 'relative' }}>
-                                            {/* SINGLE CONTINUOUS LINE */}
+                                            {/* Continuous Line: Matches TimelineItem logic */}
                                             {i !== education.length - 1 && (
                                                 <Box sx={{ 
                                                     position: 'absolute', 
                                                     left: '7px', 
-                                                    top: '16px', 
+                                                    top: '20px', 
                                                     bottom: -32, 
                                                     width: '2px', 
                                                     bgcolor: 'divider' 
                                                 }} />
                                             )}
 
+                                            {/* Icon Container: Adjusted to mask line and center perfectly */}
                                             <Box 
                                                 sx={{ 
                                                     position: 'absolute', 
-                                                    left: -10, 
-                                                    top: 6, 
+                                                    left: -11,  // Corrected center
+                                                    top: 6,     // Aligned with text
                                                     bgcolor: 'background.paper', 
                                                     p: 1,      
                                                     borderRadius: '50%',
@@ -555,12 +586,11 @@ export default function CV() {
                                     </Typography>
                                     {awards.map((award, i) => (
                                         <Box key={i} sx={{ mb: 4, pl: 4, position: 'relative' }}>
-                                            {/* SINGLE CONTINUOUS LINE */}
                                             {i !== awards.length - 1 && (
                                                 <Box sx={{ 
                                                     position: 'absolute', 
                                                     left: '7px', 
-                                                    top: '8px', 
+                                                    top: '20px', 
                                                     bottom: -32, 
                                                     width: '2px', 
                                                     bgcolor: 'divider' 
@@ -570,8 +600,8 @@ export default function CV() {
                                             <Box 
                                                 sx={{ 
                                                     position: 'absolute', 
-                                                    left: -10, 
-                                                    top: 0, 
+                                                    left: -11, // Consistent with Education
+                                                    top: 4,    // Aligned with text
                                                     bgcolor: 'background.paper', 
                                                     p: 1,      
                                                     borderRadius: '50%',
@@ -597,7 +627,9 @@ export default function CV() {
                                         <Business color="primary" /> Professional
                                     </Typography>
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
-                                        {skills.Professional.map(s => <Chip key={s} label={s} sx={{ fontSize: '1rem', py: 2.5, px: 1, borderRadius: 2 }} />)}
+                                        {skills.Professional.map(s => (
+                                            <Box key={s} sx={skillPillStyle(theme)}>{s}</Box>
+                                        ))}
                                     </Box>
                                 </Grid>
 
@@ -606,7 +638,9 @@ export default function CV() {
                                         <Badge color="primary" /> Functional
                                     </Typography>
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
-                                        {skills.Functional.map(s => <Chip key={s} label={s} sx={{ fontSize: '1rem', py: 2.5, px: 1, borderRadius: 2 }} />)}
+                                        {skills.Functional.map(s => (
+                                            <Box key={s} sx={skillPillStyle(theme)}>{s}</Box>
+                                        ))}
                                     </Box>
                                 </Grid>
 
@@ -615,7 +649,9 @@ export default function CV() {
                                         <Handyman color="primary" /> Technical & Tools
                                     </Typography>
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
-                                        {[...skills.Technical, ...skills.Tools].map(s => <Chip key={s} label={s} sx={{ fontSize: '1rem', py: 2.5, px: 1, borderRadius: 2 }} />)}
+                                        {[...skills.Technical, ...skills.Tools].map(s => (
+                                            <Box key={s} sx={skillPillStyle(theme)}>{s}</Box>
+                                        ))}
                                     </Box>
                                 </Grid>
                             </Grid>

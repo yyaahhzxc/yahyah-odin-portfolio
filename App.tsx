@@ -12,14 +12,13 @@ import Background3D from './components/Background3D';
 const Home = lazy(() => import('./pages/Home'));
 const CV = lazy(() => import('./pages/CV'));
 const ProjectList = lazy(() => import('./pages/ProjectList'));
-// Note: Lab is removed
 
 function App() {
-  const [mode, setMode] = useState<'light' | 'dark'>('dark');
+  // CHANGED: Default to 'light' instead of 'dark'
+  const [mode, setMode] = useState<'light' | 'dark'>('light');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
   
-  // Safety check for location (in case Router isn't ready)
   const location = useLocation(); 
 
   const toggleTheme = () => {

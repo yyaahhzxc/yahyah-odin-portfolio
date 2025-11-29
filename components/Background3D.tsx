@@ -3,11 +3,9 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Points, PointMaterial } from '@react-three/drei';
 import { useTheme } from '@mui/material';
 
-// Custom generator to ensure perfect array alignment (Fixes NaN error)
 const generateSphere = (count: number, radius: number) => {
-  const points = new Float32Array(count * 3); // Exact multiple of 3
+  const points = new Float32Array(count * 3);
   for (let i = 0; i < count; i++) {
-    // Uniform random distribution within a sphere
     const r = radius * Math.cbrt(Math.random());
     const theta = Math.random() * 2 * Math.PI;
     const phi = Math.acos(2 * Math.random() - 1);
@@ -28,12 +26,10 @@ const Stars = (props: any) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   
-  // Generate 2000 particles (Safe, performant, and valid)
   const sphere = useMemo(() => generateSphere(2000, 1.5), []);
 
   useFrame((state, delta) => {
     if (ref.current) {
-      // Slow, premium drift rotation
       ref.current.rotation.x -= delta / 15;
       ref.current.rotation.y -= delta / 20;
     }
@@ -45,7 +41,7 @@ const Stars = (props: any) => {
         <PointMaterial
           transparent
           color={isDark ? "#ffffff" : "#000000"}
-          size={0.002} // Very fine, high-end dust size
+          size={0.002}
           sizeAttenuation={true}
           depthWrite={false}
           opacity={isDark ? 0.8 : 0.5}

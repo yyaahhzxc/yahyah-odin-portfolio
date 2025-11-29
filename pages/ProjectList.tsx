@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Box, Container, Typography, CardContent, Chip, ButtonBase, Grid, IconButton, useTheme, useMediaQuery, Stack, Theme, Divider, Backdrop } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Close, CalendarToday, Devices, Palette, Speed, ZoomIn, ZoomOut } from '@mui/icons-material';
+import { Close, CalendarToday, Devices, Palette, Speed } from '@mui/icons-material';
 import { Footer } from '../components/Footer';
+import ProjectCard from '../components/ProjectCard'; 
 
 // --- HELPER ---
 const getImages = (folder: string, prefix: string, count: number, pad: boolean = false) => {
@@ -12,7 +13,7 @@ const getImages = (folder: string, prefix: string, count: number, pad: boolean =
   });
 };
 
-// --- DATA (Same as before) ---
+// --- DATA ---
 const projects = [
   { 
     id: 1, 
@@ -139,7 +140,7 @@ const projects = [
     category: 'UI/UX', 
     year: '2025',
     fullDate: 'April 2025',
-    image: '/Thumbnails/TESDA Website Revamped - High Fidelity Wireframe-page01.webp', 
+    image: '/Thumbnails/TESDA Website Revamped - High Fidelity Wireframe-page01.png', 
     description: 'A modern revamp of the TESDA website interface.',
     challenge: 'Revitalizing an outdated and cluttered government website to improve usability and accessibility without losing critical information.',
     solution: 'Reimagined the information architecture to reduce clutter and improve navigation. Delivered high-fidelity wireframes that presented a modern, clean, and accessible interface while retaining all necessary institutional information.',
@@ -188,153 +189,79 @@ const projects = [
 
 const categories = ['All', 'UI/UX', 'Event Slides', 'Socials', 'Academics'];
 
-// --- INTERNAL COMPONENTS ---
-
-// 1. ProjectCard (Internal to prevent import issues)
-const cardStyle = {
-  position: 'relative' as const,
-  height: '100%',
-  width: '100%',
-  cursor: 'pointer',
-  borderRadius: '24px',
-  overflow: 'hidden',
-  backgroundColor: 'transparent',
-  padding: '3px', 
-  display: 'flex',
-  flexDirection: 'column' as const,
-  transition: 'transform 0.2s ease-out',
-  willChange: 'transform', 
-};
-
-const ProjectCard = React.memo(({ project, onClick }: { project: any, onClick: () => void }) => {
-  const theme = useTheme<Theme>();
-
-  return (
-    <Grid 
-      item 
-      xs={12} sm={6} md={4} 
-      component={motion.div}
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ duration: 0.2 }} 
-    >
-      <Box 
-        onClick={onClick}
-        className="project-card-group" 
-        sx={{
-          ...cardStyle,
-          '&:hover': { transform: 'translateY(-8px)' },
-          // ROTATING BORDER
-          '&::before': {
-              content: '""',
-              position: 'absolute',
-              width: '150vmax', 
-              height: '150vmax',
-              left: '50%',
-              top: '50%',
-              marginLeft: '-75vmax',
-              marginTop: '-75vmax', 
-              // @ts-ignore
-              background: theme.custom?.borderGradient || theme.palette.primary.main,
-              animation: 'spinBorder 4s linear infinite',
-              zIndex: 0,
-              display: 'none', 
-              opacity: 0, 
-              transition: 'opacity 0.3s ease',
-          },
-          '&:hover::before': {
-              display: 'block', 
-              opacity: 1,
-          }
-        }}
-      >
-        <Box 
-            sx={{ 
-                bgcolor: 'background.paper', 
-                borderRadius: '22px', 
-                overflow: 'hidden',
-                height: '100%',
-                width: '100%',
-                position: 'relative',
-                zIndex: 1,
-                display: 'flex',
-                flexDirection: 'column'
-            }}
-        >
-            <Box sx={{ position: 'relative', height: 260, overflow: 'hidden' }}>
-                <Box 
-                  component="img"
-                  src={project.image}
-                  alt={project.title}
-                  loading="eager" 
-                  decoding="async" 
-                  sx={{ 
-                      width: '100%', 
-                      height: '100%', 
-                      objectFit: 'cover',
-                      transition: 'transform 0.4s ease',
-                      '.project-card-group:hover &': { transform: 'scale(1.05)' }
-                  }}
-                />
-            </Box>
-
-            <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                <Typography variant="h5" sx={{ fontWeight: 600, mb: 1 }}>{project.title}</Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600, fontSize: '1rem' }}>
-                    {project.category} • {project.year}
-                </Typography>
-            </CardContent>
-        </Box>
-      </Box>
-    </Grid>
-  );
-});
-
-// 2. Lightbox (Internal)
+// --- COMPONENT: LIGHTBOX (Fullscreen Viewer) ---
 const ImageLightbox = ({ image, onClose }: { image: string | null, onClose: () => void }) => {
     const [scale, setScale] = useState(1);
+    
     useEffect(() => setScale(1), [image]);
+
     if (!image) return null;
 
     const handleWheel = (e: React.WheelEvent) => {
         e.stopPropagation();
         const delta = e.deltaY * -0.001;
-        setScale(Math.min(Math.max(1, scale + delta), 3));
+        const newScale = Math.min(Math.max(1, scale + delta), 3); // Max 3x zoom
+        setScale(newScale);
     };
 
     return (
         <Backdrop 
             open={!!image} 
             onClick={onClose} 
-            sx={{ zIndex: 9999, color: '#fff', bgcolor: 'rgba(0,0,0,0.95)', backdropFilter: 'blur(10px)' }}
+            sx={{ 
+                zIndex: 9999, 
+                color: '#fff',
+                bgcolor: 'rgba(0,0,0,0.95)',
+                backdropFilter: 'blur(10px)'
+            }}
         >
-            <IconButton onClick={onClose} sx={{ position: 'absolute', top: 20, right: 20, color: 'white', zIndex: 10 }}>
+            <IconButton 
+                onClick={onClose}
+                sx={{ position: 'absolute', top: 20, right: 20, color: 'white', zIndex: 10 }}
+            >
                 <Close fontSize="large" />
             </IconButton>
-            <Box sx={{ position: 'absolute', bottom: 30, left: '50%', transform: 'translateX(-50%)', opacity: 0.6 }}>
+            
+            <Box sx={{ position: 'absolute', bottom: 30, left: '50%', transform: 'translateX(-50%)', color: 'rgba(255,255,255,0.5)', pointerEvents: 'none' }}>
                 <Typography variant="caption">Scroll to Zoom • Drag to Pan</Typography>
             </Box>
-            <Box onClick={(e) => e.stopPropagation()} onWheel={handleWheel} sx={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+
+            <Box 
+                onClick={(e) => e.stopPropagation()} 
+                onWheel={handleWheel}
+                sx={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    overflow: 'hidden'
+                }}
+            >
                 <motion.img
                     src={image}
                     drag
                     dragConstraints={{ left: -500 * (scale - 1), right: 500 * (scale - 1), top: -500 * (scale - 1), bottom: 500 * (scale - 1) }}
                     animate={{ scale }}
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                    style={{ maxHeight: '90vh', maxWidth: '90vw', cursor: scale > 1 ? 'grab' : 'default' }}
+                    style={{ 
+                        maxHeight: '90vh', 
+                        maxWidth: '90vw',
+                        cursor: scale > 1 ? 'grab' : 'default'
+                    }}
                 />
             </Box>
         </Backdrop>
     );
 };
 
-// --- MAIN PAGE ---
+// --- MAIN PAGE COMPONENT ---
 export default function ProjectList() {
   const [activeTab, setActiveTab] = useState('All');
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
   
+  // FIX: Track 'top' and 'height' for multiline support on mobile
   const [pillStyle, setPillStyle] = useState({ left: 0, top: 0, width: 0, height: 0, opacity: 0 });
   const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
 
@@ -350,11 +277,11 @@ export default function ProjectList() {
 
   const selectedProject = projects.find(p => p.id === selectedId);
 
-  // STABLE CLICK HANDLER
   const handleSelectProject = useCallback((id: number) => {
     setSelectedId(id);
   }, []);
 
+  // Escape Key Listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -366,19 +293,22 @@ export default function ProjectList() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [lightboxImage, selectedId]);
 
+  // Tab Pill Animation Calculation (REFACTORED FOR MOBILE)
   useEffect(() => {
     const activeIndex = categories.indexOf(activeTab);
+    // @ts-ignore
     const el = tabsRef.current[activeIndex];
+    
     if (el) {
       setPillStyle({
         left: el.offsetLeft,
-        top: el.offsetTop,
-        width: el.clientWidth, 
-        height: el.clientHeight,
+        top: el.offsetTop, // Crucial for vertical wrapping
+        width: el.clientWidth,
+        height: el.clientHeight, // Use actual button height
         opacity: 1
       });
     }
-  }, [activeTab, isMobile]); 
+  }, [activeTab, isMobile]); // Recalculate on resize/mobile switch
 
   useEffect(() => {
     if (selectedId) {
@@ -407,6 +337,7 @@ export default function ProjectList() {
            </motion.div>
         </Box>
 
+        {/* TABS */}
         <Box sx={{ display: 'flex', justifyContent: 'center', mb: 8 }}>
           <Box 
               sx={{ 
@@ -418,10 +349,11 @@ export default function ProjectList() {
                   position: 'relative', 
                   border: '1px solid',
                   borderColor: 'divider',
-                  flexWrap: 'wrap', 
+                  flexWrap: 'wrap', // ALLOW WRAPPING ON MOBILE
                   justifyContent: 'center'
               }}
           >
+              {/* PILL */}
               <Box
                 component={motion.div}
                 animate={pillStyle}
@@ -429,6 +361,7 @@ export default function ProjectList() {
                 transition={{ type: "spring", stiffness: 250, damping: 25 }}
                 sx={{
                     position: 'absolute',
+                    // Top/Left/Width/Height controlled by animation state
                     bgcolor: isDark ? 'rgba(255,255,255,0.2)' : 'background.paper',
                     borderRadius: '50px',
                     boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
@@ -437,6 +370,7 @@ export default function ProjectList() {
                 }}
               />
 
+              {/* TAB BUTTONS */}
               {categories.map((cat, index) => {
                   const isSelected = activeTab === cat;
                   return (
@@ -444,7 +378,11 @@ export default function ProjectList() {
                           key={cat}
                           ref={el => tabsRef.current[index] = el} 
                           disableRipple 
-                          onClick={() => { if (activeTab !== cat) setActiveTab(cat); }}
+                          onClick={() => {
+                              if (activeTab !== cat) {
+                                  setActiveTab(cat);
+                              }
+                          }}
                           sx={{
                               px: 3,
                               py: 1,
@@ -472,6 +410,7 @@ export default function ProjectList() {
           </Box>
         </Box>
 
+        {/* Grid Container */}
         <Box sx={{ minHeight: '60vh' }}>
             <AnimatePresence mode="wait">
                 <motion.div
@@ -481,6 +420,7 @@ export default function ProjectList() {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2, ease: "easeOut" }}
                 >
+                    {/* REDUCED GAP TO FOOTER: sx={{ mb: 4 }} was 8 */}
                     <Grid container spacing={4} sx={{ mb: 4 }}>
                         {filteredProjects.map((project) => (
                             <ProjectCard 
@@ -497,6 +437,7 @@ export default function ProjectList() {
         <Footer />
       </Container>
 
+      {/* EXPANDED MODAL */}
       <AnimatePresence>
         {selectedId && selectedProject && (
           <Box
@@ -567,6 +508,7 @@ export default function ProjectList() {
 
                <Box sx={{ overflowY: 'auto', flexGrow: 1, p: { xs: 4, md: 8 } }}>
                   
+                  {/* HEADER */}
                   <Box sx={{ mb: 6, mt: 2 }}>
                       <Stack direction="row" alignItems="center" gap={2} mb={2}>
                         <Chip 
@@ -595,6 +537,7 @@ export default function ProjectList() {
 
                   <Divider sx={{ mb: 6 }} />
 
+                  {/* METADATA */}
                   <Grid container spacing={4} sx={{ mb: 8 }}>
                     {selectedProject.details && (
                       <>
@@ -620,13 +563,14 @@ export default function ProjectList() {
                     )}
                   </Grid>
 
+                  {/* CHALLENGE / SOLUTION */}
                   <Grid container spacing={6} sx={{ mb: 8 }}>
                     <Grid item xs={12} md={6}>
                         <Typography variant="h4" gutterBottom sx={{ fontWeight: 700 }}>The Challenge</Typography>
                         <Typography 
                             variant="body1" 
                             color="text.secondary" 
-                            sx={{ lineHeight: 1.8, fontSize: '1.1rem', textAlign: 'justify' }}
+                            sx={{ lineHeight: 1.8, fontSize: '1.1rem', textAlign: 'justify' }} // Justified
                         >
                             {selectedProject.challenge}
                         </Typography>
@@ -636,13 +580,14 @@ export default function ProjectList() {
                         <Typography 
                             variant="body1" 
                             color="text.secondary" 
-                            sx={{ lineHeight: 1.8, fontSize: '1.1rem', textAlign: 'justify' }} 
+                            sx={{ lineHeight: 1.8, fontSize: '1.1rem', textAlign: 'justify' }} // Justified
                         >
                             {selectedProject.solution}
                         </Typography>
                     </Grid>
                   </Grid>
 
+                  {/* GALLERY */}
                   <Typography variant="overline" display="block" sx={{ mb: 3, fontWeight: 700, letterSpacing: '0.1em', color: 'text.secondary' }}>
                       PROJECT GALLERY
                   </Typography>
@@ -655,6 +600,7 @@ export default function ProjectList() {
                           return (
                             <Grid item xs={12} md={gridSize} key={i}>
                                 <Box 
+                                    // @ts-ignore
                                     component="img" 
                                     src={img} 
                                     loading="lazy"
