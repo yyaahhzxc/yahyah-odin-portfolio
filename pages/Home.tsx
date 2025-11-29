@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Chip, Stack, Avatar, Button, Grid, useMediaQuery, useTheme, Theme, Snackbar, SxProps } from '@mui/material';
+// ADDED: 'Stack' was missing from this import list
+import { Box, Typography, Avatar, Button, Grid, useTheme, Theme, Snackbar, Stack, SxProps } from '@mui/material';
 import { BentoGrid, BentoTile } from '../components/BentoGrid';
-import { Magnetic } from '../components/Magnetic';
 import { useNavigate } from 'react-router-dom';
 import { motion, Variants, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { 
@@ -147,9 +147,6 @@ export default function Home() {
   const theme = useTheme<Theme>();
   const isDark = theme.palette.mode === 'dark';
   
-  // PERFORMANCE: Detect mobile to disable heavy effects
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  
   const [toastOpen, setToastOpen] = useState(false);
   const [roleIndex, setRoleIndex] = useState(0);
 
@@ -177,14 +174,32 @@ export default function Home() {
       window.open('/CV/Odin_CV.pdf', '_blank');
   };
 
-  // EXTRACTED STYLES FOR PERFORMANCE
-  // Note: maskImage is VERY heavy on mobile. We disable it on small screens.
-  const marqueeMaskStyle = isMobile ? {} : { 
+  // --- STYLES ---
+  // Shared hover border effect style
+  const hoverBorderStyle: SxProps<Theme> = {
+    content: '""',
+    position: 'absolute',
+    inset: 0,
+    borderRadius: 'inherit',
+    padding: '2px', // Width of the border
+    // @ts-ignore
+    background: theme.custom?.borderGradient || theme.palette.primary.main,
+    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+    WebkitMaskComposite: 'xor',
+    maskComposite: 'exclude',
+    opacity: 0,
+    transition: 'opacity 0.3s ease',
+    pointerEvents: 'none',
+    zIndex: 10
+  };
+
+  // Mask styles for marquees
+  const marqueeMaskStyle: SxProps<Theme> = { 
     maskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)',
     WebkitMaskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)' 
   };
 
-  const galleryMaskStyle = isMobile ? {} : { 
+  const galleryMaskStyle: SxProps<Theme> = { 
     maskImage: 'linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)',
     WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)'
   };
@@ -196,7 +211,6 @@ export default function Home() {
         exit="exit" 
         variants={{ visible: { transition: { staggerChildren: 0.15 } } }}
     >
-      {/* PERFORMANCE: Optional: You can hide the noise overlay on mobile if it's still slow */}
       <Box className="noise-overlay" />
 
       <Box sx={{ maxWidth: '1600px', margin: '0 auto', px: { xs: 2, md: 6 }, position: 'relative', zIndex: 1, py: 2 }}>
@@ -206,9 +220,7 @@ export default function Home() {
           <Grid item xs={12} md={12} component={motion.div} variants={slideDown}>
             <BentoTile alwaysActive sx={{ minHeight: { xs: 'auto', md: '260px' }, background: theme.palette.background.paper }}>
                <Box sx={{ display: 'flex', width: '100%', height: '100%', alignItems: 'center', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 3, md: 4 }, px: 2 }}>
-                  
                   <ProfileAnimation />
-
                   <Box sx={{ flexGrow: 1, width: '100%', textAlign: { xs: 'center', md: 'left' }, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: { xs: 'center', md: 'flex-start' } }}>
                     <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: 'center', justifyContent: 'space-between', width: '100%', mb: 1, flexWrap: 'wrap', gap: 1 }}>
                         <Box component={motion.div} variants={textContainer} initial="hidden" animate="visible">
@@ -233,17 +245,7 @@ export default function Home() {
                         <Typography variant="h4" color="text.secondary" sx={{ fontWeight: 600, opacity: 0.6, ml: { xs: 0, md: 'auto' } }}>Davao City, PH</Typography>
                     </Box>
                     <Box sx={{ width: '100%', height: '1px', bgcolor: 'divider', mb: 2, display: { xs: 'none', md: 'block' } }} />
-                    <Typography 
-                      variant="body1" 
-                      sx={{ 
-                        width: '100%', 
-                        color: 'text.secondary', 
-                        fontSize: { xs: '1rem', md: '1.2rem' }, 
-                        lineHeight: 1.6, 
-                        display: 'block',
-                        textAlign: { xs: 'center', md: 'justify' }
-                      }}
-                    >
+                    <Typography variant="body1" sx={{ width: '100%', color: 'text.secondary', fontSize: { xs: '1rem', md: '1.2rem' }, lineHeight: 1.6, display: 'block', textAlign: { xs: 'center', md: 'justify' } }}>
                       Junior CS Student at Ateneo de Davao University. Associate to the External Vice President of CSSEC. Specialized in UI/UX, QA, and Creative Leadership.
                     </Typography>
                   </Box>
@@ -252,8 +254,6 @@ export default function Home() {
           </Grid>
 
           {/* --- ROW 2: CORE --- */}
-          
-          {/* TOOLKIT */}
           <Grid item xs={12} md={4} component={motion.div} variants={slideRight}>
              <BentoTile title="Toolkit" sx={{ minHeight: '340px' }}>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1, height: '100%', justifyContent: 'center' }}>
@@ -271,55 +271,17 @@ export default function Home() {
              </BentoTile>
           </Grid>
 
-          {/* CENTER CARD */}
           <Grid item xs={12} md={4} component={motion.div} variants={slideUp}>
-            <BentoTile 
-                borderless 
-                sx={{ 
-                    height: '100%', 
-                    minHeight: '340px', 
-                    // @ts-ignore
-                    background: theme.custom?.iridescentGradient || theme.palette.primary.main, 
-                    textAlign: 'center', 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    alignItems: 'center', 
-                    justifyContent: 'center', 
-                    border: 'none',
-                    boxShadow: isDark ? '0 20px 50px -10px rgba(0, 229, 255, 0.3)' : '0 20px 50px -10px rgba(217, 70, 239, 0.3)' 
-                }}
-            >
+            <BentoTile borderless sx={{ height: '100%', minHeight: '340px', background: theme.palette.mode === 'dark' ? theme.custom?.iridescentGradient : theme.palette.primary.main, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: 'none', boxShadow: isDark ? '0 20px 50px -10px rgba(0, 229, 255, 0.3)' : '0 20px 50px -10px rgba(217, 70, 239, 0.3)' }}>
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', px: 2 }}>
                     <LayoutGroup>
                         <motion.div layout style={{ marginBottom: '16px' }}>
-                            <Typography variant="h6" sx={{ color: isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.5)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                                Yahyah Odin
-                            </Typography>
+                            <Typography variant="h6" sx={{ color: isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.5)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Yahyah Odin</Typography>
                         </motion.div>
-                        
                         <Box sx={{ minHeight: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
                           <AnimatePresence mode="popLayout">
-                            <motion.div
-                              key={roleIndex}
-                              layout 
-                              initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                              animate={{ opacity: 1, y: 0, scale: 1 }}
-                              exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                              transition={{ duration: 0.4, ease: "easeInOut" }}
-                              style={{ width: '100%' }}
-                            >
-                              <Typography 
-                                variant="h3" 
-                                sx={{ 
-                                    color: isDark ? 'white' : 'rgba(0,0,0,0.8)', 
-                                    fontWeight: 800, 
-                                    fontSize: { xs: '1.8rem', md: '2.5rem' },
-                                    lineHeight: 1.2, 
-                                    textShadow: isDark ? '0 4px 20px rgba(0,0,0,0.2)' : 'none' 
-                                }}
-                              >
-                                  {ROLES[roleIndex]}
-                              </Typography>
+                            <motion.div key={roleIndex} layout initial={{ opacity: 0, y: 20, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -20, scale: 0.95 }} transition={{ duration: 0.4, ease: "easeInOut" }} style={{ width: '100%' }}>
+                              <Typography variant="h3" sx={{ color: isDark ? 'white' : 'rgba(0,0,0,0.8)', fontWeight: 800, fontSize: { xs: '1.8rem', md: '2.5rem' }, lineHeight: 1.2, textShadow: isDark ? '0 4px 20px rgba(0,0,0,0.2)' : 'none' }}>{ROLES[roleIndex]}</Typography>
                             </motion.div>
                           </AnimatePresence>
                         </Box>
@@ -328,48 +290,14 @@ export default function Home() {
             </BentoTile>
           </Grid>
 
-          {/* CONNECT */}
           <Grid item xs={12} md={4} component={motion.div} variants={slideLeft}>
-               <Box sx={{ 
-                   display: 'grid', 
-                   gridTemplateColumns: '1fr 1fr', 
-                   gridTemplateRows: '1fr 1fr', 
-                   gap: 2, 
-                   height: '100%',
-                   minHeight: { xs: '340px', md: 'auto' } 
-               }}>
-                 {[
-                    { icon: <GitHub sx={{ fontSize: 80 }} />, link: 'https://github.com/yyaahhzxc/', label: 'yyaahhzxc', title: 'GitHub' },
-                    { icon: <Facebook sx={{ fontSize: 80 }} />, link: 'https://www.facebook.com/odin.yahyah/', label: 'Yahyah Odin', title: 'Facebook' }, 
-                    { icon: <LinkedIn sx={{ fontSize: 80 }} />, link: 'https://www.linkedin.com/in/yahyah-odin-1083b2373/', label: 'Yahyah Odin', title: 'LinkedIn' },
-                    { icon: <Email sx={{ fontSize: 80 }} />, link: 'yahyahodin@gmail.com', label: 'yahyahodin@gmail.com', title: 'Email' }
-                 ].map((item, i) => (
-                       <Box 
-                           key={i} 
-                           onClick={() => handleContactClick(item.title, item.link)} 
-                           sx={{ 
-                               width: '100%', 
-                               height: '100%', 
-                               perspective: '1000px', 
-                               cursor: 'pointer', 
-                               '&:hover .flipper': { transform: 'rotateY(180deg)' } 
-                           }}
-                       >
-                          <Box 
-                              className="flipper" 
-                              sx={{ 
-                                  width: '100%', 
-                                  height: '100%', 
-                                  position: 'relative', 
-                                  transformStyle: 'preserve-3d', 
-                                  transition: 'transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)',
-                              }}
-                          >
-                             {/* FRONT */}
+               <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: 2, height: '100%', minHeight: { xs: '340px', md: 'auto' } }}>
+                 {[{ icon: <GitHub sx={{ fontSize: 80 }} />, link: 'https://github.com/yyaahhzxc/', label: 'yyaahhzxc', title: 'GitHub' }, { icon: <Facebook sx={{ fontSize: 80 }} />, link: 'https://www.facebook.com/odin.yahyah/', label: 'Yahyah Odin', title: 'Facebook' }, { icon: <LinkedIn sx={{ fontSize: 80 }} />, link: 'https://www.linkedin.com/in/yahyah-odin-1083b2373/', label: 'Yahyah Odin', title: 'LinkedIn' }, { icon: <Email sx={{ fontSize: 80 }} />, link: 'yahyahodin@gmail.com', label: 'yahyahodin@gmail.com', title: 'Email' }].map((item, i) => (
+                       <Box key={i} onClick={() => handleContactClick(item.title, item.link)} sx={{ width: '100%', height: '100%', perspective: '1000px', cursor: 'pointer', '&:hover .flipper': { transform: 'rotateY(180deg)' } }}>
+                          <Box className="flipper" sx={{ width: '100%', height: '100%', position: 'relative', transformStyle: 'preserve-3d', transition: 'transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)' }}>
                              <Box sx={{ position: 'absolute', inset: 0, backfaceVisibility: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'action.hover', border: '1px solid', borderColor: 'divider', borderRadius: 4 }}>
                                 <Box sx={{ color: 'text.primary' }}>{item.icon}</Box>
                              </Box>
-                             {/* BACK */}
                              <Box sx={{ position: 'absolute', inset: 0, backfaceVisibility: 'hidden', transform: 'rotateY(180deg)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', bgcolor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)', border: '1px solid', borderColor: 'divider', borderRadius: 4, gap: 1, p: 1, textAlign: 'center' }}>
                                 <Typography variant="h5" fontWeight={800}>{item.title}</Typography>
                                 <Typography variant="body1" sx={{ wordBreak: 'break-word', fontSize: '0.8rem', fontWeight: 700 }}>{item.label}</Typography>
@@ -384,27 +312,23 @@ export default function Home() {
           
           {/* VIEW CV */}
           <Grid item xs={12} md={4} component={motion.div} variants={slideRight}>
-             <BentoTile onClick={handleViewCV} sx={{ background: theme.palette.background.paper, height: '100%', minHeight: '280px', overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Box 
-                    sx={{ 
-                        position: 'absolute', 
-                        inset: 0, 
-                        overflow: 'hidden', 
-                        opacity: 0.25, 
-                        ...marqueeMaskStyle, // PERFORMANCE: Disable mask on mobile
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        zIndex: 0 
-                    }}
-                >
+             <BentoTile onClick={handleViewCV} sx={{ background: theme.palette.background.paper, height: '100%', minHeight: '280px', overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                // HOVER EFFECT: Add border glow
+                '&:hover::after': { opacity: 1 },
+                '&::after': hoverBorderStyle,
+                // HOVER EFFECT: Clear blur on content
+                '&:hover .cv-marquee': { filter: 'blur(0px)', opacity: 1 }
+             }}>
+                <Box sx={{ position: 'absolute', inset: 0, overflow: 'hidden', opacity: 0.25, ...marqueeMaskStyle, display: 'flex', alignItems: 'center', zIndex: 0 }}>
                     <motion.div 
-                        // PERFORMANCE: Add will-change to hint GPU
-                        style={{ display: 'flex', whiteSpace: 'nowrap', willChange: 'transform' }} 
+                        className="cv-marquee"
+                        style={{ display: 'flex', whiteSpace: 'nowrap', willChange: 'transform', filter: 'blur(1.5px)', transition: 'filter 0.3s ease, opacity 0.3s ease' }} 
+                        // SEAMLESS LOOP: 4 Copies ensures we never see the "seam"
                         animate={{ x: ["0%", "-50%"] }} 
-                        transition={{ duration: 40, ease: "linear", repeat: Infinity }} 
+                        transition={{ duration: 80, ease: "linear", repeat: Infinity }} 
                     >
-                        {[...timelineItems, ...timelineItems].map((item, i) => (
-                            <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 2, mr: 10, filter: isMobile ? 'none' : 'blur(1px)' }}> 
+                        {[...timelineItems, ...timelineItems, ...timelineItems, ...timelineItems].map((item, i) => (
+                            <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 2, mr: 10 }}> 
                                 <Typography variant="h3" sx={{ fontWeight: 800, color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.15)' }}>{item.year}</Typography>
                                 <Box sx={{ width: 60, height: 3, bgcolor: 'divider' }} />
                                 <Typography variant="h4" sx={{ fontWeight: 700, textTransform: 'uppercase', color: 'text.secondary', opacity: 0.8 }}>{item.label}</Typography>
@@ -434,39 +358,35 @@ export default function Home() {
                      overflow: 'hidden', 
                      display: 'flex', 
                      alignItems: 'stretch',
+                     // HOVER EFFECT: Add border glow
+                     '&:hover::after': { opacity: 1 },
+                     '&::after': hoverBorderStyle,
+                     // HOVER EFFECT: Clear grayscale on images
+                     '&:hover .work-image': { filter: 'grayscale(0%)', opacity: 1 }
                  }}
              >
-                <Box 
-                    sx={{ 
-                        position: 'absolute', 
-                        top: 0, 
-                        left: 0, 
-                        width: '200%', 
-                        height: '100%', 
-                        opacity: 0.3, 
-                        display: 'flex', 
-                        ...galleryMaskStyle // PERFORMANCE: Disable mask on mobile
-                    }}
-                >
+                <Box sx={{ position: 'absolute', top: 0, left: 0, height: '100%', opacity: 0.3, display: 'flex', ...galleryMaskStyle }}>
                     <motion.div 
-                        // PERFORMANCE: Add will-change to hint GPU
-                        style={{ display: 'flex', width: '100%', willChange: 'transform' }} 
+                        style={{ display: 'flex', width: 'fit-content', willChange: 'transform' }} 
+                        // SEAMLESS LOOP: 4 Copies
                         animate={{ x: ["0%", "-50%"] }} 
-                        transition={{ duration: 30, ease: "linear", repeat: Infinity }} 
+                        transition={{ duration: 120, ease: "linear", repeat: Infinity }} 
                     >
-                        {[...workImages, ...workImages].map((img, i) => (
+                        {[...workImages, ...workImages, ...workImages, ...workImages].map((img, i) => (
                             // @ts-ignore
                             <Box 
                                 key={i} 
+                                className="work-image"
                                 component="img" 
                                 src={img} 
                                 sx={{ 
-                                    width: '12.5%', 
+                                    width: 'auto',
                                     height: '100%', 
                                     objectFit: 'cover', 
-                                    // PERFORMANCE: Disable filter on mobile
-                                    filter: isMobile ? 'none' : 'grayscale(100%)', 
-                                    opacity: 0.7 
+                                    flexShrink: 0, 
+                                    filter: 'grayscale(100%)', 
+                                    opacity: 0.7,
+                                    transition: 'filter 0.4s ease, opacity 0.4s ease'
                                 }} 
                             />
                         ))}
@@ -494,30 +414,13 @@ export default function Home() {
         </BentoGrid>
       </Box>
 
-      {/* Toast Notification */}
       <Snackbar 
         open={toastOpen} 
         autoHideDuration={3000} 
         onClose={() => setToastOpen(false)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        <Box
-            sx={{ 
-                px: 3, 
-                py: 1.5, 
-                bgcolor: theme.palette.mode === 'dark' ? 'rgba(20, 20, 25, 0.9)' : 'rgba(255, 255, 255, 0.9)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 4,
-                color: 'text.primary',
-                fontWeight: 600,
-                boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 2
-            }}
-        >
+        <Box sx={{ px: 3, py: 1.5, bgcolor: theme.palette.mode === 'dark' ? 'rgba(20, 20, 25, 0.9)' : 'rgba(255, 255, 255, 0.9)', backdropFilter: 'blur(10px)', border: '1px solid', borderColor: 'divider', borderRadius: 4, color: 'text.primary', fontWeight: 600, boxShadow: '0 4px 20px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: 2 }}>
             <Typography variant="body2" fontWeight={600}>Email copied to clipboard!</Typography>
         </Box>
       </Snackbar>

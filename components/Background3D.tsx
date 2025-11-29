@@ -26,7 +26,7 @@ const Stars = (props: any) => {
   const theme = useTheme<Theme>();
   const isDark = theme.palette.mode === 'dark';
   
-  // OPTIMIZATION: Reduce particle count significantly on mobile
+  // OPTIMIZATION: Reduce particle count on mobile
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const count = isMobile ? 400 : 2000;
   
@@ -41,7 +41,15 @@ const Stars = (props: any) => {
 
   return (
     <group rotation={[0, 0, Math.PI / 4]}>
-      <Points ref={ref} positions={sphere} stride={3} frustumCulled={false} {...props}>
+      {/* FIX: Added key={count} to force re-mount when particle count changes */}
+      <Points 
+        key={count} 
+        ref={ref} 
+        positions={sphere} 
+        stride={3} 
+        frustumCulled={false} 
+        {...props}
+      >
         <PointMaterial
           transparent
           color={isDark ? "#ffffff" : "#000000"}
