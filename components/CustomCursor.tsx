@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { motion, useMotionValue, useSpring } from 'framer-motion';
+import { motion, useMotionValue } from 'framer-motion';
 import { useTheme, useMediaQuery, GlobalStyles } from '@mui/material';
 
 export const CustomCursor = () => {
@@ -7,13 +7,12 @@ export const CustomCursor = () => {
   const isDesktop = useMediaQuery('(pointer: fine)');
   const isDarkMode = theme.palette.mode === 'dark';
   
+  // Use MotionValues for high-performance direct DOM updates
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
   
-  // THE "SETTLED" PHYSICS CONFIG
-  const springConfig = { damping: 25, stiffness: 400, mass: 0.2 };
-  const cursorXSpring = useSpring(cursorX, springConfig);
-  const cursorYSpring = useSpring(cursorY, springConfig);
+  // REMOVED: Spring physics config
+  // The cursor will now follow the mouse exactly 1:1 without smoothing/lag
 
   const [isHovering, setIsHovering] = useState(false);
   const [isClicking, setIsClicking] = useState(false);
@@ -66,11 +65,10 @@ export const CustomCursor = () => {
   if (!isDesktop) return null;
 
   // DYNAMIC COLORS BASED ON THEME
-  // Light Mode: Black Border, Darker Smoked Glass Fill
   const cursorColor = isDarkMode ? 'white' : 'black';
   const glassFill = isDarkMode 
     ? 'rgba(255, 255, 255, 0.1)' 
-    : 'rgba(0, 0, 0, 0.15)'; // Darker fill for light mode visibility
+    : 'rgba(0, 0, 0, 0.15)'; 
   
   const shadowColor = isDarkMode ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.2)';
 
@@ -87,8 +85,9 @@ export const CustomCursor = () => {
 
       <motion.div
         style={{
-          translateX: cursorXSpring,
-          translateY: cursorYSpring,
+          // CHANGED: Use raw values directly for instant response
+          translateX: cursorX,
+          translateY: cursorY,
           position: 'fixed',
           top: 0,
           left: 0,

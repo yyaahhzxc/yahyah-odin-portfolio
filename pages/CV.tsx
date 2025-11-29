@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Box, Typography, Container, Stack, Avatar, Grid, Button, useTheme, Theme, ButtonBase, Chip, useMediaQuery, Divider } from '@mui/material';
+import { Box, Typography, Container, Stack, Avatar, Grid, Button, useTheme, Theme, ButtonBase, useMediaQuery, Divider } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Download, Email, Phone, LocationOn, School, Star, Group, Handyman, Business, EmojiEvents, Badge } from '@mui/icons-material';
+import { Download, Email, Phone, LocationOn, School, Star, Handyman, Business, EmojiEvents, Badge } from '@mui/icons-material';
 import { Footer } from '../components/Footer';
 import { Magnetic } from '../components/Magnetic';
 
@@ -18,7 +18,6 @@ const itemVariants = {
 
 // --- DATA ---
 
-// 1. EDUCATION
 const education = [
     { school: "Ateneo de Davao University", degree: "Bachelor of Science in Computer Science", period: "2021 - Present" },
     { school: "Notre Dame of Cotabato", degree: "Senior High School (STEM)", period: "2019 - 2021" },
@@ -237,7 +236,8 @@ const skillPillStyle = (theme: Theme) => ({
     }
 });
 
-const TimelineItem = ({ title, subtitle, period, description }: any) => {
+// --- UPDATED UNIFIED TIMELINE ITEM ---
+const TimelineItem = ({ title, subtitle, period, description, icon, isFirst, isLast }: any) => {
     const theme = useTheme<Theme>();
     return (
         <Box 
@@ -245,31 +245,66 @@ const TimelineItem = ({ title, subtitle, period, description }: any) => {
             variants={itemVariants}
             sx={{ position: 'relative', pl: 4, pb: 6, '&:last-child': { pb: 0 } }}
         >
+            {/* CONTINUOUS VERTICAL LINE */}
             <Box 
                 sx={{ 
                     position: 'absolute', 
                     left: '7px', 
-                    top: '8px', 
-                    bottom: -6, 
+                    // LOGIC: If first, start at 16px (center of icon). Else start at 0 (connect from prev).
+                    top: isFirst ? '16px' : 0, 
+                    // LOGIC: If last, stop at 16px (center of icon). Else go to bottom (connect to next).
+                    bottom: isLast ? 'auto' : 0, 
+                    height: isLast ? '16px' : 'auto',
                     width: '2px', 
                     bgcolor: 'divider',
-                    '.MuiBox-root:last-child > &': { display: 'none' } 
                 }} 
             />
-            <Box 
-                sx={{ 
-                    position: 'absolute', 
-                    left: 0, 
-                    top: '8px', 
-                    width: '16px', 
-                    height: '16px', 
-                    borderRadius: '50%', 
-                    // @ts-ignore
-                    background: theme.custom?.iridescentGradient || theme.palette.primary.main,
-                    boxShadow: theme.palette.mode === 'dark' ? '0 0 12px rgba(0, 229, 255, 0.5)' : '0 0 12px rgba(217, 70, 239, 0.5)',
-                    zIndex: 1
-                }} 
-            />
+            
+            {/* MARKER (ICON or DOT) */}
+            {icon ? (
+                // ICON MARKER
+                <Box 
+                    sx={{ 
+                        position: 'absolute', 
+                        // UPDATED: Centered 28px box on 8px axis -> left: 8 - 14 = -6px
+                        left: -6, 
+                        top: 2, // 2px + 14px (half height) = 16px CENTER
+                        width: 28,
+                        height: 28,
+                        bgcolor: 'background.paper', 
+                        borderRadius: '50%', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        zIndex: 1,
+                        border: '2px solid',
+                        borderColor: 'background.paper',
+                        color: 'primary.main',
+                        boxShadow: theme.palette.mode === 'dark' ? '0 0 10px rgba(0,0,0,0.5)' : '0 2px 5px rgba(0,0,0,0.1)'
+                    }}
+                >
+                    {React.cloneElement(icon, { sx: { fontSize: '18px' } })}
+                </Box>
+            ) : (
+                // STANDARD DOT MARKER
+                <Box 
+                    sx={{ 
+                        position: 'absolute', 
+                        left: 0, 
+                        top: '8px', // 8px + 8px (half height) = 16px CENTER
+                        width: 16, 
+                        height: 16, 
+                        borderRadius: '50%', 
+                        // @ts-ignore
+                        background: theme.custom?.iridescentGradient || theme.palette.primary.main,
+                        boxShadow: theme.palette.mode === 'dark' ? '0 0 12px rgba(0, 229, 255, 0.5)' : '0 0 12px rgba(217, 70, 239, 0.5)',
+                        zIndex: 1,
+                        border: '2px solid',
+                        borderColor: 'background.paper'
+                    }} 
+                />
+            )}
+
             <Typography variant="h5" sx={{ fontWeight: 700, lineHeight: 1.2, mb: 0.5 }}>{title}</Typography>
             <Typography variant="subtitle1" sx={{ color: 'primary.main', mb: 0.5, fontWeight: 600, fontFamily: 'Space Grotesk' }}>{subtitle}</Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block', mb: 2, fontStyle: 'italic' }}>{period}</Typography>
@@ -286,8 +321,7 @@ const TimelineItem = ({ title, subtitle, period, description }: any) => {
 
 export default function CV() {
   const theme = useTheme<Theme>();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const isMobile = useMediaQuery(theme.breakpoints.down('md')); // Kept for future use if needed
+  const isMobile = useMediaQuery(theme.breakpoints.down('md')); 
   const isDark = theme.palette.mode === 'dark';
   
   const [activeTab, setActiveTab] = useState('Education');
@@ -376,40 +410,82 @@ export default function CV() {
 
                  <AnimatePresence mode="wait">
                      <motion.div key={activeTab} variants={containerVariants} initial="hidden" animate="visible" exit={{ opacity: 0, y: 10, transition: { duration: 0.15 } }}>
-                        {activeTab === 'Experience' && (<Box>{experiences.map((exp, i) => (<TimelineItem key={i} title={exp.role} subtitle={exp.event} period={exp.period} description={exp.description} />))}</Box>)}
-                        {activeTab === 'Affiliations' && (<Box>{affiliations.map((aff, i) => (<TimelineItem key={i} title={aff.org} subtitle={aff.role} period={aff.period} description={aff.description} />))}</Box>)}
+                        
+                        {/* EXPERIENCE (Standard dots) */}
+                        {activeTab === 'Experience' && (
+                            <Box>
+                                {experiences.map((exp, i) => (
+                                    <TimelineItem 
+                                        key={i} 
+                                        title={exp.role} 
+                                        subtitle={exp.event} 
+                                        period={exp.period} 
+                                        description={exp.description}
+                                        isFirst={i === 0}
+                                        isLast={i === experiences.length - 1}
+                                    />
+                                ))}
+                            </Box>
+                        )}
+
+                        {/* AFFILIATIONS (Standard dots) */}
+                        {activeTab === 'Affiliations' && (
+                            <Box>
+                                {affiliations.map((aff, i) => (
+                                    <TimelineItem 
+                                        key={i} 
+                                        title={aff.org} 
+                                        subtitle={aff.role} 
+                                        period={aff.period} 
+                                        description={aff.description}
+                                        isFirst={i === 0}
+                                        isLast={i === affiliations.length - 1} 
+                                    />
+                                ))}
+                            </Box>
+                        )}
+
+                        {/* EDUCATION (Icons) */}
                         {activeTab === 'Education' && (
                             <Box>
                                 <Box sx={{ mb: 6 }}>
                                     <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: 700, mb: 3 }}><School color="primary" /> Education</Typography>
                                     {education.map((edu, i) => (
-                                        <Box key={i} sx={{ mb: 4, pl: 4, position: 'relative' }}>
-                                            {i !== education.length - 1 && (<Box sx={{ position: 'absolute', left: '7px', top: '20px', bottom: -32, width: '2px', bgcolor: 'divider' }} />)}
-                                            <Box sx={{ position: 'absolute', left: -17, top: 6, bgcolor: 'background.paper', p: 1, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}><School color="primary" fontSize="small" /></Box>
-                                            <Typography variant="h4" fontWeight={700} mb={1}>{edu.school}</Typography>
-                                            <Typography variant="h6" color="primary.main" mb={1}>{edu.degree}</Typography>
-                                            <Typography variant="body1" color="text.secondary">{edu.period}</Typography>
-                                        </Box>
+                                        <TimelineItem 
+                                            key={i}
+                                            title={edu.school}
+                                            subtitle={edu.degree}
+                                            period={edu.period}
+                                            icon={<School />} 
+                                            isFirst={i === 0}
+                                            isLast={i === education.length - 1}
+                                        />
                                     ))}
                                 </Box>
                             </Box>
                         )}
+
+                        {/* AWARDS (Icons) */}
                         {activeTab === 'Awards' && (
                              <Box>
                                 <Box>
                                     <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: 700, mb: 3 }}><EmojiEvents color="primary" /> Awards</Typography>
                                     {awards.map((award, i) => (
-                                        <Box key={i} sx={{ mb: 4, pl: 4, position: 'relative' }}>
-                                            {i !== awards.length - 1 && (<Box sx={{ position: 'absolute', left: '7px', top: '8px', bottom: -32, width: '2px', bgcolor: 'divider' }} />)}
-                                            <Box sx={{ position: 'absolute', left: -17, top: 0, bgcolor: 'background.paper', p: 1, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}><Star color="primary" fontSize="small" /></Box>
-                                            <Typography variant="h5" fontWeight={700} mb={1}>{award.title}</Typography>
-                                            <Typography variant="h6" color="text.secondary">{award.org}</Typography>
-                                            <Typography variant="body1" color="text.secondary">{award.year}</Typography>
-                                        </Box>
+                                        <TimelineItem 
+                                            key={i}
+                                            title={award.title}
+                                            subtitle={award.org}
+                                            period={award.year}
+                                            icon={<Star />} 
+                                            isFirst={i === 0}
+                                            isLast={i === awards.length - 1}
+                                        />
                                     ))}
                                 </Box>
                             </Box>
                         )}
+
+                        {/* SKILLS (Standard Grid) */}
                         {activeTab === 'Skills' && (
                             <Grid container spacing={6}>
                                 <Grid item xs={12}>

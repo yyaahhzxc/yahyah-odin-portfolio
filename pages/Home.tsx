@@ -173,7 +173,7 @@ export default function Home() {
       window.open('/CV/Odin_CV.pdf', '_blank');
   };
 
-  // --- TOUCH HANDLERS (Mobile Persistence) ---
+  // --- TOUCH HANDLERS ---
   const handleTouchStart = (e: React.TouchEvent) => {
     e.currentTarget.classList.add('active-touch');
   };
@@ -186,7 +186,7 @@ export default function Home() {
 
   // --- STYLES ---
   
-  // Hover/Touch Border Effect
+  // Standard hover border
   const hoverBorderStyle: SxProps<Theme> = {
     content: '""',
     position: 'absolute',
@@ -202,6 +202,12 @@ export default function Home() {
     transition: 'opacity 0.3s ease',
     pointerEvents: 'none',
     zIndex: 10
+  };
+
+  // Contact Card Specific Border (With Delay for Flip)
+  const contactCardBorderStyle: SxProps<Theme> = {
+    ...hoverBorderStyle,
+    transition: 'opacity 0.2s ease', // Fast exit
   };
 
   const marqueeMaskStyle: SxProps<Theme> = { 
@@ -265,7 +271,6 @@ export default function Home() {
 
           {/* --- ROW 2: CORE --- */}
           <Grid item xs={12} md={4} component={motion.div} variants={slideRight}>
-             {/* FIX: Added touch handlers to Toolkit card */}
              <BentoTile 
                 title="Toolkit" 
                 sx={{ minHeight: '340px' }}
@@ -288,7 +293,23 @@ export default function Home() {
           </Grid>
 
           <Grid item xs={12} md={4} component={motion.div} variants={slideUp}>
-            <BentoTile borderless sx={{ height: '100%', minHeight: '340px', background: theme.palette.mode === 'dark' ? theme.custom?.iridescentGradient : theme.palette.primary.main, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: 'none', boxShadow: isDark ? '0 20px 50px -10px rgba(0, 229, 255, 0.3)' : '0 20px 50px -10px rgba(217, 70, 239, 0.3)' }}>
+            <BentoTile 
+                borderless 
+                sx={{ 
+                    height: '100%', 
+                    minHeight: '340px', 
+                    // FIXED: Always use iridescentGradient if available, for both light & dark mode
+                    // @ts-ignore
+                    background: theme.custom?.iridescentGradient || theme.palette.primary.main, 
+                    textAlign: 'center', 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    border: 'none', 
+                    boxShadow: isDark ? '0 20px 50px -10px rgba(0, 229, 255, 0.3)' : '0 20px 50px -10px rgba(217, 70, 239, 0.3)' 
+                }}
+            >
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', px: 2 }}>
                     <LayoutGroup>
                         <motion.div layout style={{ marginBottom: '16px' }}>
@@ -320,11 +341,12 @@ export default function Home() {
                                perspective: '1000px', 
                                cursor: 'pointer', 
                                position: 'relative',
-                               // FIX: Added explicit borderRadius: 4 to container so border inherits it
                                borderRadius: 4, 
                                '&:hover .flipper, &.active-touch .flipper': { transform: 'rotateY(180deg)' },
-                               '&::after': hoverBorderStyle,
-                               '&:hover::after, &.active-touch::after': { opacity: 1 }
+                               // Use custom style for contact cards
+                               '&::after': contactCardBorderStyle,
+                               // ADDED: 0.6s DELAY for the border to appear, matching the flip duration
+                               '&:hover::after, &.active-touch::after': { opacity: 1, transition: 'opacity 0.3s ease 0.3s' }
                            }}
                        >
                           <Box className="flipper" sx={{ width: '100%', height: '100%', position: 'relative', transformStyle: 'preserve-3d', transition: 'transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)' }}>
