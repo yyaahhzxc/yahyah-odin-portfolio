@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-// ADDED: 'Stack' was missing from this import list
 import { Box, Typography, Avatar, Button, Grid, useTheme, Theme, Snackbar, Stack, SxProps } from '@mui/material';
 import { BentoGrid, BentoTile } from '../components/BentoGrid';
 import { useNavigate } from 'react-router-dom';
@@ -174,14 +173,26 @@ export default function Home() {
       window.open('/CV/Odin_CV.pdf', '_blank');
   };
 
+  // --- TOUCH HANDLERS (Mobile Persistence) ---
+  const handleTouchStart = (e: React.TouchEvent) => {
+    e.currentTarget.classList.add('active-touch');
+  };
+  
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    setTimeout(() => {
+       if (e.target) (e.target as HTMLElement).closest('.active-touch')?.classList.remove('active-touch');
+    }, 150);
+  };
+
   // --- STYLES ---
-  // Shared hover border effect style
+  
+  // Hover/Touch Border Effect
   const hoverBorderStyle: SxProps<Theme> = {
     content: '""',
     position: 'absolute',
     inset: 0,
     borderRadius: 'inherit',
-    padding: '2px', // Width of the border
+    padding: '2px',
     // @ts-ignore
     background: theme.custom?.borderGradient || theme.palette.primary.main,
     WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
@@ -193,7 +204,6 @@ export default function Home() {
     zIndex: 10
   };
 
-  // Mask styles for marquees
   const marqueeMaskStyle: SxProps<Theme> = { 
     maskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)',
     WebkitMaskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)' 
@@ -255,7 +265,13 @@ export default function Home() {
 
           {/* --- ROW 2: CORE --- */}
           <Grid item xs={12} md={4} component={motion.div} variants={slideRight}>
-             <BentoTile title="Toolkit" sx={{ minHeight: '340px' }}>
+             {/* FIX: Added touch handlers to Toolkit card */}
+             <BentoTile 
+                title="Toolkit" 
+                sx={{ minHeight: '340px' }}
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+             >
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1, height: '100%', justifyContent: 'center' }}>
                    {skillCategories.map((cat) => (
                      <Box key={cat.name}>
@@ -293,7 +309,24 @@ export default function Home() {
           <Grid item xs={12} md={4} component={motion.div} variants={slideLeft}>
                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: 2, height: '100%', minHeight: { xs: '340px', md: 'auto' } }}>
                  {[{ icon: <GitHub sx={{ fontSize: 80 }} />, link: 'https://github.com/yyaahhzxc/', label: 'yyaahhzxc', title: 'GitHub' }, { icon: <Facebook sx={{ fontSize: 80 }} />, link: 'https://www.facebook.com/odin.yahyah/', label: 'Yahyah Odin', title: 'Facebook' }, { icon: <LinkedIn sx={{ fontSize: 80 }} />, link: 'https://www.linkedin.com/in/yahyah-odin-1083b2373/', label: 'Yahyah Odin', title: 'LinkedIn' }, { icon: <Email sx={{ fontSize: 80 }} />, link: 'yahyahodin@gmail.com', label: 'yahyahodin@gmail.com', title: 'Email' }].map((item, i) => (
-                       <Box key={i} onClick={() => handleContactClick(item.title, item.link)} sx={{ width: '100%', height: '100%', perspective: '1000px', cursor: 'pointer', '&:hover .flipper': { transform: 'rotateY(180deg)' } }}>
+                       <Box 
+                           key={i} 
+                           onClick={() => handleContactClick(item.title, item.link)}
+                           onTouchStart={handleTouchStart}
+                           onTouchEnd={handleTouchEnd}
+                           sx={{ 
+                               width: '100%', 
+                               height: '100%', 
+                               perspective: '1000px', 
+                               cursor: 'pointer', 
+                               position: 'relative',
+                               // FIX: Added explicit borderRadius: 4 to container so border inherits it
+                               borderRadius: 4, 
+                               '&:hover .flipper, &.active-touch .flipper': { transform: 'rotateY(180deg)' },
+                               '&::after': hoverBorderStyle,
+                               '&:hover::after, &.active-touch::after': { opacity: 1 }
+                           }}
+                       >
                           <Box className="flipper" sx={{ width: '100%', height: '100%', position: 'relative', transformStyle: 'preserve-3d', transition: 'transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)' }}>
                              <Box sx={{ position: 'absolute', inset: 0, backfaceVisibility: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'action.hover', border: '1px solid', borderColor: 'divider', borderRadius: 4 }}>
                                 <Box sx={{ color: 'text.primary' }}>{item.icon}</Box>
@@ -312,18 +345,20 @@ export default function Home() {
           
           {/* VIEW CV */}
           <Grid item xs={12} md={4} component={motion.div} variants={slideRight}>
-             <BentoTile onClick={handleViewCV} sx={{ background: theme.palette.background.paper, height: '100%', minHeight: '280px', overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                // HOVER EFFECT: Add border glow
-                '&:hover::after': { opacity: 1 },
-                '&::after': hoverBorderStyle,
-                // HOVER EFFECT: Clear blur on content
-                '&:hover .cv-marquee': { filter: 'blur(0px)', opacity: 1 }
+             <BentoTile 
+                onClick={handleViewCV} 
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+                sx={{ 
+                    background: theme.palette.background.paper, height: '100%', minHeight: '280px', overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                    '&:hover::after, &.active-touch::after': { opacity: 1 },
+                    '&::after': hoverBorderStyle,
+                    '&:hover .cv-marquee, &.active-touch .cv-marquee': { filter: 'blur(0px)', opacity: 1 }
              }}>
                 <Box sx={{ position: 'absolute', inset: 0, overflow: 'hidden', opacity: 0.25, ...marqueeMaskStyle, display: 'flex', alignItems: 'center', zIndex: 0 }}>
                     <motion.div 
                         className="cv-marquee"
                         style={{ display: 'flex', whiteSpace: 'nowrap', willChange: 'transform', filter: 'blur(1.5px)', transition: 'filter 0.3s ease, opacity 0.3s ease' }} 
-                        // SEAMLESS LOOP: 4 Copies ensures we never see the "seam"
                         animate={{ x: ["0%", "-50%"] }} 
                         transition={{ duration: 80, ease: "linear", repeat: Infinity }} 
                     >
@@ -349,7 +384,9 @@ export default function Home() {
              <BentoTile 
                  title="Latest Works" 
                  link="/portfolio" 
-                 onClick={() => navigate('/portfolio')} 
+                 onClick={() => navigate('/portfolio')}
+                 onTouchStart={handleTouchStart}
+                 onTouchEnd={handleTouchEnd}
                  sx={{ 
                      background: theme.palette.background.paper,
                      color: 'text.primary',
@@ -358,17 +395,14 @@ export default function Home() {
                      overflow: 'hidden', 
                      display: 'flex', 
                      alignItems: 'stretch',
-                     // HOVER EFFECT: Add border glow
-                     '&:hover::after': { opacity: 1 },
+                     '&:hover::after, &.active-touch::after': { opacity: 1 },
                      '&::after': hoverBorderStyle,
-                     // HOVER EFFECT: Clear grayscale on images
-                     '&:hover .work-image': { filter: 'grayscale(0%)', opacity: 1 }
+                     '&:hover .work-image, &.active-touch .work-image': { filter: 'grayscale(0%)', opacity: 1 }
                  }}
              >
                 <Box sx={{ position: 'absolute', top: 0, left: 0, height: '100%', opacity: 0.3, display: 'flex', ...galleryMaskStyle }}>
                     <motion.div 
                         style={{ display: 'flex', width: 'fit-content', willChange: 'transform' }} 
-                        // SEAMLESS LOOP: 4 Copies
                         animate={{ x: ["0%", "-50%"] }} 
                         transition={{ duration: 120, ease: "linear", repeat: Infinity }} 
                     >

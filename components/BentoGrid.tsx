@@ -9,6 +9,10 @@ interface BentoTileProps {
   icon?: React.ReactNode;
   link?: string;
   onClick?: () => void;
+  // ADDED: Touch handlers and className support
+  onTouchStart?: React.TouchEventHandler<HTMLDivElement>;
+  onTouchEnd?: React.TouchEventHandler<HTMLDivElement>;
+  className?: string;
   background?: string;
   gradient?: boolean;
   alwaysActive?: boolean;
@@ -24,7 +28,10 @@ export const BentoTile: React.FC<BentoTileProps> = ({
   subtitle, 
   icon, 
   link, 
-  onClick, 
+  onClick,
+  onTouchStart,
+  onTouchEnd,
+  className,
   background, 
   gradient,
   alwaysActive,
@@ -45,21 +52,21 @@ export const BentoTile: React.FC<BentoTileProps> = ({
     ? 'rgba(255, 255, 255, 0.1)' 
     : 'rgba(0, 0, 0, 0.05)';
 
-  // Extract padding-related props from sx to prevent overrides if necessary,
-  // but usually putting our styles LAST wins.
-  // However, we want to allow custom dimensions but ENFORCE the border padding.
-  
   const borderPadding = borderless ? '0px' : '2px';
 
   return (
     <MotionCard
       onMouseMove={handleMouseMove}
+      // ADDED: Pass touch handlers
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
       variants={{
         hidden: { opacity: 0, y: 20 },
         visible: { opacity: 1, y: 0 }
       }}
       onClick={onClick}
-      className="group relative"
+      // ADDED: Append custom className
+      className={`group relative ${className || ''}`}
       sx={{
         // Default Styles
         height: '100%',
@@ -76,7 +83,7 @@ export const BentoTile: React.FC<BentoTileProps> = ({
         // Spread User Styles first
         ...sx,
 
-        // FORCE structural styles LAST to prevent breaking the border
+        // FORCE structural styles LAST
         padding: borderPadding, 
         
         // ROTATING BORDER LAYER
@@ -97,7 +104,8 @@ export const BentoTile: React.FC<BentoTileProps> = ({
             transition: 'opacity 0.3s ease',
         },
         
-        '&:hover::before': {
+        // ADDED: Support active-touch class for mobile
+        '&:hover::before, &.active-touch::before': {
             opacity: 1,
         }
       }}
@@ -144,8 +152,8 @@ export const BentoTile: React.FC<BentoTileProps> = ({
           width: '100%',
           background: borderless ? 'transparent' : (background || theme.palette.background.paper),
           borderRadius: borderless ? 0 : '22px', 
-          overflow: 'hidden', // Ensure content clips to rounded corners
-          p: 3 // Default internal padding
+          overflow: 'hidden', 
+          p: 3 
       }}>
         {(title || icon) && (
             <Box sx={{ mb: 2 }}>
