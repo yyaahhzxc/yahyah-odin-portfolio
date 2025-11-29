@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Box, Container, Typography, CardContent, Chip, ButtonBase, Grid, IconButton, useTheme, useMediaQuery, Stack, Theme, Divider, Backdrop } from '@mui/material';
+import { Box, Container, Typography, ButtonBase, Grid, IconButton, useTheme, useMediaQuery, Stack, Theme, Divider, Backdrop, Chip } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Close, CalendarToday, Devices, Palette, Speed } from '@mui/icons-material';
+import { Close, CalendarToday } from '@mui/icons-material';
 import { Footer } from '../components/Footer';
-import ProjectCard from '../components/ProjectCard'; 
+import ProjectCard from '../components/ProjectCard';
 
 // --- HELPER ---
 const getImages = (folder: string, prefix: string, count: number, pad: boolean = false) => {
@@ -197,7 +197,7 @@ const ImageLightbox = ({ image, onClose }: { image: string | null, onClose: () =
 
     if (!image) return null;
 
-    const handleWheel = (e: React.WheelEvent) => {
+    const handleWheel = (e: any) => {
         e.stopPropagation();
         const delta = e.deltaY * -0.001;
         const newScale = Math.min(Math.max(1, scale + delta), 3); // Max 3x zoom
@@ -227,7 +227,7 @@ const ImageLightbox = ({ image, onClose }: { image: string | null, onClose: () =
             </Box>
 
             <Box 
-                onClick={(e) => e.stopPropagation()} 
+                onClick={(e: any) => e.stopPropagation()} 
                 onWheel={handleWheel}
                 sx={{ 
                     width: '100%', 
@@ -238,7 +238,9 @@ const ImageLightbox = ({ image, onClose }: { image: string | null, onClose: () =
                     overflow: 'hidden'
                 }}
             >
-                <motion.img
+                {/* @ts-ignore */}
+                <Box 
+                    component={motion.img}
                     src={image}
                     drag
                     dragConstraints={{ left: -500 * (scale - 1), right: 500 * (scale - 1), top: -500 * (scale - 1), bottom: 500 * (scale - 1) }}
@@ -627,10 +629,10 @@ export default function ProjectList() {
       </AnimatePresence>
 
       {/* FULLSCREEN LIGHTBOX */}
-      <ImageLightbox 
-        image={lightboxImage} 
-        onClose={() => setLightboxImage(null)} 
-      />
+        <ImageLightbox 
+         image={lightboxImage} 
+         onClose={() => setLightboxImage(null)} 
+       />
 
     </motion.div>
     </>

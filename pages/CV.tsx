@@ -25,7 +25,6 @@ const education = [
     { school: "Notre Dame of Cotabato", degree: "Junior High School", period: "2016 - 2019" }
 ];
 
-// 2. AFFILIATIONS
 const affiliations = [
   {
     org: "Computer Studies Student Executive Council",
@@ -116,13 +115,11 @@ const affiliations = [
   }
 ];
 
-// 3. AWARDS
 const awards = [
     { title: "With Honors", org: "Notre Dame of Cotabato - Senior High School", year: "2021" },
     { title: "With Honors", org: "Notre Dame of Cotabato - Junior High School", year: "2019" }
 ];
 
-// 4. EXPERIENCES / ACHIEVEMENTS
 const experiences = [
   {
     role: "Overall Assistant Head - Computer Studies Cluster",
@@ -211,7 +208,6 @@ const experiences = [
   }
 ];
 
-// 5. SKILLS
 const skills = {
     Professional: ["Detail-Oriented", "Project Management", "Communication", "Collaboration", "Leadership"],
     Functional: ["Technical Writing", "Proofreading", "Researching", "Copy Reading and Editing"],
@@ -249,24 +245,22 @@ const TimelineItem = ({ title, subtitle, period, description }: any) => {
             variants={itemVariants}
             sx={{ position: 'relative', pl: 4, pb: 6, '&:last-child': { pb: 0 } }}
         >
-            {/* Continuous Vertical Line */}
             <Box 
                 sx={{ 
                     position: 'absolute', 
                     left: '7px', 
-                    top: '20px', 
+                    top: '8px', 
                     bottom: -6, 
                     width: '2px', 
                     bgcolor: 'divider',
                     '.MuiBox-root:last-child > &': { display: 'none' } 
                 }} 
             />
-            {/* Dot */}
             <Box 
                 sx={{ 
                     position: 'absolute', 
                     left: 0, 
-                    top: '4px', 
+                    top: '8px', 
                     width: '16px', 
                     height: '16px', 
                     borderRadius: '50%', 
@@ -276,11 +270,9 @@ const TimelineItem = ({ title, subtitle, period, description }: any) => {
                     zIndex: 1
                 }} 
             />
-            
             <Typography variant="h5" sx={{ fontWeight: 700, lineHeight: 1.2, mb: 0.5 }}>{title}</Typography>
             <Typography variant="subtitle1" sx={{ color: 'primary.main', mb: 0.5, fontWeight: 600, fontFamily: 'Space Grotesk' }}>{subtitle}</Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block', mb: 2, fontStyle: 'italic' }}>{period}</Typography>
-            
             {description && (
                 <Box component="ul" sx={{ m: 0, pl: 2, color: 'text.secondary' }}>
                     {description.map((item: string, i: number) => (
@@ -294,7 +286,8 @@ const TimelineItem = ({ title, subtitle, period, description }: any) => {
 
 export default function CV() {
   const theme = useTheme<Theme>();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const isMobile = useMediaQuery(theme.breakpoints.down('md')); // Kept for future use if needed
   const isDark = theme.palette.mode === 'dark';
   
   const [activeTab, setActiveTab] = useState('Education');
@@ -317,7 +310,7 @@ export default function CV() {
         opacity: 1
       });
     }
-  }, [activeTab, isMobile]);
+  }, [activeTab]); 
 
   return (
     <motion.div
@@ -328,128 +321,40 @@ export default function CV() {
     >
       <Container maxWidth="lg" sx={{ pt: { xs: 4, md: 8 }, pb: 8 }}>
           <Grid container spacing={8}>
-              
-              {/* SIDEBAR */}
               <Grid item xs={12} md={4}>
                   <Box sx={{ position: { md: 'sticky' }, top: 100, textAlign: { xs: 'center', md: 'left' } }}>
-                      
-                      {/* ANIMATED PROFILE PICTURE */}
                       <Box sx={{ position: 'relative', display: 'inline-block', mb: 3 }}>
-                         <Box 
-                            className="profile-wrapper"
-                            sx={{ 
-                                position: 'relative', 
-                                display: 'inline-block',
-                                '&:hover .border-glow': { opacity: 1 }
-                            }}
-                         >
-                             <Box 
-                                className="border-glow"
-                                sx={{
-                                    position: 'absolute',
-                                    inset: '-4px',
-                                    borderRadius: '50%',
-                                    // @ts-ignore
-                                    background: theme.custom?.borderGradient || theme.palette.primary.main,
-                                    animation: 'spinBorder 4s linear infinite',
-                                    zIndex: 0,
-                                    opacity: 0,
-                                    transition: 'opacity 0.3s ease',
-                                }}
-                             />
+                         <Box className="profile-wrapper" sx={{ position: 'relative', display: 'inline-block', '&:hover .border-glow': { opacity: 1 } }}>
+                             <Box className="border-glow" sx={{ position: 'absolute', inset: '-4px', borderRadius: '50%', 
+                                // @ts-ignore
+                                background: theme.custom?.borderGradient || theme.palette.primary.main, animation: 'spinBorder 4s linear infinite', zIndex: 0, opacity: 0, transition: 'opacity 0.3s ease' }} />
                              <Box sx={{ position: 'relative', zIndex: 1, borderRadius: '50%', bgcolor: 'background.paper' }}>
-                                <Avatar 
-                                    src="/Pictures/odin_formal.jpg" 
-                                    sx={{ 
-                                        width: 200, 
-                                        height: 200, 
-                                        border: '4px solid', 
-                                        borderColor: 'background.paper',
-                                        bgcolor: 'primary.main',
-                                        fontSize: '4rem',
-                                    }} 
-                                >YO</Avatar>
+                                <Avatar src="/Pictures/odin_formal.jpg" sx={{ width: 200, height: 200, border: '4px solid', borderColor: 'background.paper', bgcolor: 'primary.main', fontSize: '4rem' }}>YO</Avatar>
                              </Box>
                          </Box>
                       </Box>
-                      
-                      <Typography variant="h3" sx={{ fontWeight: 800, mb: 1, letterSpacing: '-0.02em' }}>
-                        Yahyah Odin
-                      </Typography>
-                      
-                      <Typography variant="h6" color="primary" sx={{ mb: 3, fontWeight: 600, fontFamily: 'Space Grotesk' }}>
-                        Associate to the External Vice President
-                      </Typography>
-                      
-                      <Typography variant="body1" color="text.secondary" sx={{ mb: 4, lineHeight: 1.8, fontSize: '1.05rem' }}>
-                          I am a junior Bachelor of Science in Computer Science student at Ateneo de Davao University. I have maintained active service within our cluster council for two years. With a decade-long track record of student leadership, governance, and experience, I have become flexible in any situation, capable of adapting to diverse tasks ranging from technical coordination to administrative support.
-                      </Typography>
-
+                      <Typography variant="h3" sx={{ fontWeight: 800, mb: 1, letterSpacing: '-0.02em' }}>Yahyah Odin</Typography>
+                      <Typography variant="h6" color="primary" sx={{ mb: 3, fontWeight: 600, fontFamily: 'Space Grotesk' }}>Associate to the External Vice President</Typography>
+                      <Typography variant="body1" color="text.secondary" sx={{ mb: 4, lineHeight: 1.8, fontSize: '1.05rem' }}>I am a junior Bachelor of Science in Computer Science student...</Typography>
                       <Divider sx={{ mb: 4 }} />
-                      
                       <Stack spacing={2} sx={{ mb: 4, alignItems: { xs: 'center', md: 'flex-start' } }}>
-                          <Typography variant="body1" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                              <Email color="primary" /> yahyahodin@gmail.com
-                          </Typography>
-                          <Typography variant="body1" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                              <Phone color="primary" /> +63 994 6311 997
-                          </Typography>
-                          <Typography variant="body1" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                              <LocationOn color="primary" /> Davao City
-                          </Typography>
+                          <Typography variant="body1" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}><Email color="primary" /> yahyahodin@gmail.com</Typography>
+                          <Typography variant="body1" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}><Phone color="primary" /> +63 994 6311 997</Typography>
+                          <Typography variant="body1" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}><LocationOn color="primary" /> Davao City</Typography>
                       </Stack>
-
                       <Magnetic strength={0.2}>
-                        <Button 
-                            variant="contained" 
-                            startIcon={<Download />}
-                            fullWidth
-                            onClick={() => window.open('/CV/Odin_CV.pdf', '_blank')}
-                            sx={{ borderRadius: 2, py: 1.5, fontSize: '1rem', fontWeight: 700 }}
-                        >
-                            Download CV
-                        </Button>
+                        <Button variant="contained" startIcon={<Download />} fullWidth onClick={() => window.open('/CV/Odin_CV.pdf', '_blank')} sx={{ borderRadius: 2, py: 1.5, fontSize: '1rem', fontWeight: 700 }}>Download CV</Button>
                       </Magnetic>
                   </Box>
               </Grid>
 
-              {/* MAIN CONTENT AREA */}
               <Grid item xs={12} md={8}>
-                 
-                 {/* TABS */}
                  <Box sx={{ display: 'flex', justifyContent: { xs: 'center', md: 'flex-start' }, mb: 6 }} onMouseLeave={() => setHoveredTab(null)}>
-                     <Box 
-                        sx={{ 
-                            display: 'inline-flex', 
-                            position: 'relative',
-                            p: 0.5,
-                            bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
-                            borderRadius: '50px',
-                            border: '1px solid',
-                            borderColor: 'divider',
-                            flexWrap: 'wrap', 
-                            justifyContent: 'center'
-                        }}
-                     >
-                        <Box
-                            component={motion.div}
-                            animate={pillStyle}
-                            initial={false} 
-                            transition={{ type: "spring", stiffness: 250, damping: 25 }}
-                            sx={{
-                                position: 'absolute',
-                                bgcolor: isDark ? 'rgba(255,255,255,0.2)' : 'background.paper',
-                                borderRadius: '50px',
-                                boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-                                zIndex: 0,
-                                pointerEvents: 'none'
-                            }}
-                        />
-
+                     <Box sx={{ display: 'inline-flex', position: 'relative', p: 0.5, bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', borderRadius: '50px', border: '1px solid', borderColor: 'divider', flexWrap: 'wrap', justifyContent: 'center' }}>
+                        <Box component={motion.div} animate={pillStyle} initial={false} transition={{ type: "spring", stiffness: 250, damping: 25 }} sx={{ position: 'absolute', bgcolor: isDark ? 'rgba(255,255,255,0.2)' : 'background.paper', borderRadius: '50px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', zIndex: 0, pointerEvents: 'none' }} />
                         {tabs.map((tab, index) => {
                             const isSelected = activeTab === tab;
                             const isHovered = hoveredTab === tab;
-
                             return (
                                 <ButtonBase
                                     key={tab}
@@ -457,38 +362,10 @@ export default function CV() {
                                     disableRipple
                                     onClick={() => { if (activeTab !== tab) setActiveTab(tab); }}
                                     onMouseEnter={() => setHoveredTab(tab)}
-                                    sx={{ 
-                                        px: 3, 
-                                        py: 1, 
-                                        borderRadius: '50px',
-                                        position: 'relative',
-                                        zIndex: 1,
-                                        color: isSelected 
-                                            ? (isDark ? 'white' : 'black') 
-                                            : 'text.secondary',
-                                        fontWeight: isSelected ? 700 : 500,
-                                        fontSize: '1rem',
-                                        fontFamily: 'Space Grotesk',
-                                        transition: 'color 0.2s',
-                                        whiteSpace: 'nowrap'
-                                    }}
+                                    sx={{ px: 3, py: 1, borderRadius: '50px', position: 'relative', zIndex: 1, color: isSelected ? (isDark ? 'white' : 'black') : 'text.secondary', fontWeight: isSelected ? 700 : 500, fontSize: '1rem', fontFamily: 'Space Grotesk', transition: 'color 0.2s', whiteSpace: 'nowrap' }}
                                 >
                                     {isHovered && !isSelected && (
-                                        <Box 
-                                            component={motion.div}
-                                            layoutId="hover-pill"
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            transition={{ duration: 0.2 }}
-                                            sx={{
-                                                position: 'absolute',
-                                                inset: 0,
-                                                bgcolor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
-                                                borderRadius: '50px',
-                                                zIndex: -1
-                                            }}
-                                        />
+                                        <Box component={motion.div} layoutId="hover-pill" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} sx={{ position: 'absolute', inset: 0, bgcolor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)', borderRadius: '50px', zIndex: -1 }} />
                                     )}
                                     {tab}
                                 </ButtonBase>
@@ -497,78 +374,18 @@ export default function CV() {
                      </Box>
                  </Box>
 
-                 {/* CONTENT */}
                  <AnimatePresence mode="wait">
-                     <motion.div
-                        key={activeTab}
-                        variants={containerVariants}
-                        initial="hidden"
-                        animate="visible"
-                        exit={{ opacity: 0, y: 10, transition: { duration: 0.15 } }}
-                     >
-                        {activeTab === 'Experience' && (
-                            <Box>
-                                {experiences.map((exp, i) => (
-                                    <TimelineItem 
-                                        key={i} 
-                                        title={exp.role} 
-                                        subtitle={exp.event} 
-                                        period={exp.period} 
-                                        description={exp.description} 
-                                    />
-                                ))}
-                            </Box>
-                        )}
-
-                        {activeTab === 'Affiliations' && (
-                            <Box>
-                                {affiliations.map((aff, i) => (
-                                    <TimelineItem 
-                                        key={i} 
-                                        title={aff.org} 
-                                        subtitle={aff.role} 
-                                        period={aff.period}
-                                        description={aff.description} 
-                                    />
-                                ))}
-                            </Box>
-                        )}
-
+                     <motion.div key={activeTab} variants={containerVariants} initial="hidden" animate="visible" exit={{ opacity: 0, y: 10, transition: { duration: 0.15 } }}>
+                        {activeTab === 'Experience' && (<Box>{experiences.map((exp, i) => (<TimelineItem key={i} title={exp.role} subtitle={exp.event} period={exp.period} description={exp.description} />))}</Box>)}
+                        {activeTab === 'Affiliations' && (<Box>{affiliations.map((aff, i) => (<TimelineItem key={i} title={aff.org} subtitle={aff.role} period={aff.period} description={aff.description} />))}</Box>)}
                         {activeTab === 'Education' && (
                             <Box>
                                 <Box sx={{ mb: 6 }}>
-                                    <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: 700, mb: 3 }}>
-                                        <School color="primary" /> Education
-                                    </Typography>
+                                    <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: 700, mb: 3 }}><School color="primary" /> Education</Typography>
                                     {education.map((edu, i) => (
                                         <Box key={i} sx={{ mb: 4, pl: 4, position: 'relative' }}>
-                                            {/* Continuous Line: Matches TimelineItem logic */}
-                                            {i !== education.length - 1 && (
-                                                <Box sx={{ 
-                                                    position: 'absolute', 
-                                                    left: '7px', 
-                                                    top: '20px', 
-                                                    bottom: -32, 
-                                                    width: '2px', 
-                                                    bgcolor: 'divider' 
-                                                }} />
-                                            )}
-
-                                            {/* Icon Container: Adjusted to mask line and center perfectly */}
-                                            <Box 
-                                                sx={{ 
-                                                    position: 'absolute', 
-                                                    left: -11,  // Corrected center
-                                                    top: 6,     // Aligned with text
-                                                    bgcolor: 'background.paper', 
-                                                    p: 1,      
-                                                    borderRadius: '50%',
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    zIndex: 1
-                                                }}
-                                            >
-                                                <School color="primary" fontSize="small" />
-                                            </Box>
+                                            {i !== education.length - 1 && (<Box sx={{ position: 'absolute', left: '7px', top: '20px', bottom: -32, width: '2px', bgcolor: 'divider' }} />)}
+                                            <Box sx={{ position: 'absolute', left: -17, top: 6, bgcolor: 'background.paper', p: 1, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}><School color="primary" fontSize="small" /></Box>
                                             <Typography variant="h4" fontWeight={700} mb={1}>{edu.school}</Typography>
                                             <Typography variant="h6" color="primary.main" mb={1}>{edu.degree}</Typography>
                                             <Typography variant="body1" color="text.secondary">{edu.period}</Typography>
@@ -577,40 +394,14 @@ export default function CV() {
                                 </Box>
                             </Box>
                         )}
-
                         {activeTab === 'Awards' && (
                              <Box>
                                 <Box>
-                                    <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: 700, mb: 3 }}>
-                                        <EmojiEvents color="primary" /> Awards
-                                    </Typography>
+                                    <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1, fontWeight: 700, mb: 3 }}><EmojiEvents color="primary" /> Awards</Typography>
                                     {awards.map((award, i) => (
                                         <Box key={i} sx={{ mb: 4, pl: 4, position: 'relative' }}>
-                                            {i !== awards.length - 1 && (
-                                                <Box sx={{ 
-                                                    position: 'absolute', 
-                                                    left: '7px', 
-                                                    top: '20px', 
-                                                    bottom: -32, 
-                                                    width: '2px', 
-                                                    bgcolor: 'divider' 
-                                                }} />
-                                            )}
-
-                                            <Box 
-                                                sx={{ 
-                                                    position: 'absolute', 
-                                                    left: -11, // Consistent with Education
-                                                    top: 4,    // Aligned with text
-                                                    bgcolor: 'background.paper', 
-                                                    p: 1,      
-                                                    borderRadius: '50%',
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    zIndex: 1
-                                                }}
-                                            >
-                                                <Star color="primary" fontSize="small" />
-                                            </Box>
+                                            {i !== awards.length - 1 && (<Box sx={{ position: 'absolute', left: '7px', top: '8px', bottom: -32, width: '2px', bgcolor: 'divider' }} />)}
+                                            <Box sx={{ position: 'absolute', left: -17, top: 0, bgcolor: 'background.paper', p: 1, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}><Star color="primary" fontSize="small" /></Box>
                                             <Typography variant="h5" fontWeight={700} mb={1}>{award.title}</Typography>
                                             <Typography variant="h6" color="text.secondary">{award.org}</Typography>
                                             <Typography variant="body1" color="text.secondary">{award.year}</Typography>
@@ -619,53 +410,27 @@ export default function CV() {
                                 </Box>
                             </Box>
                         )}
-
                         {activeTab === 'Skills' && (
                             <Grid container spacing={6}>
                                 <Grid item xs={12}>
-                                    <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3, fontWeight: 700 }}>
-                                        <Business color="primary" /> Professional
-                                    </Typography>
-                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
-                                        {skills.Professional.map(s => (
-                                            <Box key={s} sx={skillPillStyle(theme)}>{s}</Box>
-                                        ))}
-                                    </Box>
+                                    <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3, fontWeight: 700 }}><Business color="primary" /> Professional</Typography>
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>{skills.Professional.map(s => (<Box key={s} sx={skillPillStyle(theme)}>{s}</Box>))}</Box>
                                 </Grid>
-
                                 <Grid item xs={12}>
-                                    <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3, fontWeight: 700 }}>
-                                        <Badge color="primary" /> Functional
-                                    </Typography>
-                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
-                                        {skills.Functional.map(s => (
-                                            <Box key={s} sx={skillPillStyle(theme)}>{s}</Box>
-                                        ))}
-                                    </Box>
+                                    <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3, fontWeight: 700 }}><Badge color="primary" /> Functional</Typography>
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>{skills.Functional.map(s => (<Box key={s} sx={skillPillStyle(theme)}>{s}</Box>))}</Box>
                                 </Grid>
-
                                 <Grid item xs={12}>
-                                    <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3, fontWeight: 700 }}>
-                                        <Handyman color="primary" /> Technical & Tools
-                                    </Typography>
-                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
-                                        {[...skills.Technical, ...skills.Tools].map(s => (
-                                            <Box key={s} sx={skillPillStyle(theme)}>{s}</Box>
-                                        ))}
-                                    </Box>
+                                    <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3, fontWeight: 700 }}><Handyman color="primary" /> Technical & Tools</Typography>
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>{[...skills.Technical, ...skills.Tools].map(s => (<Box key={s} sx={skillPillStyle(theme)}>{s}</Box>))}</Box>
                                 </Grid>
                             </Grid>
                         )}
-
                      </motion.div>
                  </AnimatePresence>
-
               </Grid>
           </Grid>
-          
-          <Box sx={{ mt: 8 }}>
-            <Footer />
-          </Box>
+          <Box sx={{ mt: 8 }}><Footer /></Box>
       </Container>
     </motion.div>
   );
