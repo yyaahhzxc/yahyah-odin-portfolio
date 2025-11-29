@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Chip, Stack, Avatar, Button, Grid, useMediaQuery, useTheme, Theme, Snackbar } from '@mui/material';
+import { Box, Typography, Chip, Stack, Avatar, Button, Grid, useMediaQuery, useTheme, Theme, Snackbar, SxProps } from '@mui/material';
 import { BentoGrid, BentoTile } from '../components/BentoGrid';
 import { Magnetic } from '../components/Magnetic';
 import { useNavigate } from 'react-router-dom';
@@ -147,6 +147,9 @@ export default function Home() {
   const theme = useTheme<Theme>();
   const isDark = theme.palette.mode === 'dark';
   
+  // PERFORMANCE: Detect mobile to disable heavy effects
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  
   const [toastOpen, setToastOpen] = useState(false);
   const [roleIndex, setRoleIndex] = useState(0);
 
@@ -174,6 +177,18 @@ export default function Home() {
       window.open('/CV/Odin_CV.pdf', '_blank');
   };
 
+  // EXTRACTED STYLES FOR PERFORMANCE
+  // Note: maskImage is VERY heavy on mobile. We disable it on small screens.
+  const marqueeMaskStyle = isMobile ? {} : { 
+    maskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)',
+    WebkitMaskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)' 
+  };
+
+  const galleryMaskStyle = isMobile ? {} : { 
+    maskImage: 'linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)',
+    WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)'
+  };
+
   return (
     <motion.div 
         initial="hidden" 
@@ -181,6 +196,7 @@ export default function Home() {
         exit="exit" 
         variants={{ visible: { transition: { staggerChildren: 0.15 } } }}
     >
+      {/* PERFORMANCE: Optional: You can hide the noise overlay on mobile if it's still slow */}
       <Box className="noise-overlay" />
 
       <Box sx={{ maxWidth: '1600px', margin: '0 auto', px: { xs: 2, md: 6 }, position: 'relative', zIndex: 1, py: 2 }}>
@@ -188,7 +204,6 @@ export default function Home() {
           
           {/* --- ROW 1: PROFILE BANNER --- */}
           <Grid item xs={12} md={12} component={motion.div} variants={slideDown}>
-            {/* Removed extra styling overrides that broke the border */}
             <BentoTile alwaysActive sx={{ minHeight: { xs: 'auto', md: '260px' }, background: theme.palette.background.paper }}>
                <Box sx={{ display: 'flex', width: '100%', height: '100%', alignItems: 'center', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 3, md: 4 }, px: 2 }}>
                   
@@ -259,7 +274,7 @@ export default function Home() {
           {/* CENTER CARD */}
           <Grid item xs={12} md={4} component={motion.div} variants={slideUp}>
             <BentoTile 
-                borderless // Added borderless explicitly
+                borderless 
                 sx={{ 
                     height: '100%', 
                     minHeight: '340px', 
@@ -270,7 +285,7 @@ export default function Home() {
                     flexDirection: 'column', 
                     alignItems: 'center', 
                     justifyContent: 'center', 
-                    border: 'none', // Ensure no default border
+                    border: 'none',
                     boxShadow: isDark ? '0 20px 50px -10px rgba(0, 229, 255, 0.3)' : '0 20px 50px -10px rgba(217, 70, 239, 0.3)' 
                 }}
             >
@@ -370,14 +385,26 @@ export default function Home() {
           {/* VIEW CV */}
           <Grid item xs={12} md={4} component={motion.div} variants={slideRight}>
              <BentoTile onClick={handleViewCV} sx={{ background: theme.palette.background.paper, height: '100%', minHeight: '280px', overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Box sx={{ position: 'absolute', inset: 0, overflow: 'hidden', opacity: 0.25, maskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)', display: 'flex', alignItems: 'center', zIndex: 0 }}>
+                <Box 
+                    sx={{ 
+                        position: 'absolute', 
+                        inset: 0, 
+                        overflow: 'hidden', 
+                        opacity: 0.25, 
+                        ...marqueeMaskStyle, // PERFORMANCE: Disable mask on mobile
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        zIndex: 0 
+                    }}
+                >
                     <motion.div 
+                        // PERFORMANCE: Add will-change to hint GPU
+                        style={{ display: 'flex', whiteSpace: 'nowrap', willChange: 'transform' }} 
                         animate={{ x: ["0%", "-50%"] }} 
                         transition={{ duration: 40, ease: "linear", repeat: Infinity }} 
-                        style={{ display: 'flex', whiteSpace: 'nowrap' }} 
                     >
                         {[...timelineItems, ...timelineItems].map((item, i) => (
-                            <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 2, filter: 'blur(1px)', mr: 10 }}> 
+                            <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 2, mr: 10, filter: isMobile ? 'none' : 'blur(1px)' }}> 
                                 <Typography variant="h3" sx={{ fontWeight: 800, color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.15)' }}>{item.year}</Typography>
                                 <Box sx={{ width: 60, height: 3, bgcolor: 'divider' }} />
                                 <Typography variant="h4" sx={{ fontWeight: 700, textTransform: 'uppercase', color: 'text.secondary', opacity: 0.8 }}>{item.label}</Typography>
@@ -407,23 +434,45 @@ export default function Home() {
                      overflow: 'hidden', 
                      display: 'flex', 
                      alignItems: 'stretch',
-                     // FIX: Removed pl: 0 from container to preserve border
                  }}
              >
-                <Box sx={{ position: 'absolute', top: 0, left: 0, width: '200%', height: '100%', opacity: 0.3, display: 'flex', maskImage: 'linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)' }}>
+                <Box 
+                    sx={{ 
+                        position: 'absolute', 
+                        top: 0, 
+                        left: 0, 
+                        width: '200%', 
+                        height: '100%', 
+                        opacity: 0.3, 
+                        display: 'flex', 
+                        ...galleryMaskStyle // PERFORMANCE: Disable mask on mobile
+                    }}
+                >
                     <motion.div 
+                        // PERFORMANCE: Add will-change to hint GPU
+                        style={{ display: 'flex', width: '100%', willChange: 'transform' }} 
                         animate={{ x: ["0%", "-50%"] }} 
                         transition={{ duration: 30, ease: "linear", repeat: Infinity }} 
-                        style={{ display: 'flex', width: '100%' }} 
                     >
                         {[...workImages, ...workImages].map((img, i) => (
                             // @ts-ignore
-                            <Box key={i} component="img" src={img} sx={{ width: '12.5%', height: '100%', objectFit: 'cover', filter: 'grayscale(100%)', opacity: 0.7 }} />
+                            <Box 
+                                key={i} 
+                                component="img" 
+                                src={img} 
+                                sx={{ 
+                                    width: '12.5%', 
+                                    height: '100%', 
+                                    objectFit: 'cover', 
+                                    // PERFORMANCE: Disable filter on mobile
+                                    filter: isMobile ? 'none' : 'grayscale(100%)', 
+                                    opacity: 0.7 
+                                }} 
+                            />
                         ))}
                     </motion.div>
                 </Box>
                 
-                {/* Inner content with negative margin to flush images if desired, or standard padding */}
                 <Box sx={{ position: 'relative', zIndex: 2, width: '100%', pointerEvents: 'none', px: 0, pt: 4, pb: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                    <Typography variant="h2" sx={{ opacity: 1, mb: 2, fontWeight: 800 }}>Explore Selected Projects</Typography>
                    <Button sx={{ 

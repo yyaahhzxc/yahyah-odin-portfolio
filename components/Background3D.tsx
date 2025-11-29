@@ -1,7 +1,7 @@
 import React, { useRef, useMemo, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Points, PointMaterial } from '@react-three/drei';
-import { useTheme } from '@mui/material';
+import { useTheme, useMediaQuery, Theme } from '@mui/material';
 
 const generateSphere = (count: number, radius: number) => {
   const points = new Float32Array(count * 3);
@@ -23,10 +23,14 @@ const generateSphere = (count: number, radius: number) => {
 
 const Stars = (props: any) => {
   const ref = useRef<any>();
-  const theme = useTheme();
+  const theme = useTheme<Theme>();
   const isDark = theme.palette.mode === 'dark';
   
-  const sphere = useMemo(() => generateSphere(2000, 1.5), []);
+  // OPTIMIZATION: Reduce particle count significantly on mobile
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const count = isMobile ? 400 : 2000;
+  
+  const sphere = useMemo(() => generateSphere(count, 1.5), [count]);
 
   useFrame((state, delta) => {
     if (ref.current) {
@@ -54,7 +58,7 @@ const Stars = (props: any) => {
 const Background3D = () => {
   return (
     <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, opacity: 0.6, pointerEvents: 'none' }}>
-      <Canvas camera={{ position: [0, 0, 1] }}>
+      <Canvas camera={{ position: [0, 0, 1] }} dpr={[1, 2]}> 
         <Suspense fallback={null}>
           <Stars />
         </Suspense>

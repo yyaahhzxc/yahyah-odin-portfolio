@@ -14,7 +14,6 @@ const CV = lazy(() => import('./pages/CV'));
 const ProjectList = lazy(() => import('./pages/ProjectList'));
 
 function App() {
-  // CHANGED: Default to 'light' instead of 'dark'
   const [mode, setMode] = useState<'light' | 'dark'>('light');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
@@ -28,6 +27,24 @@ function App() {
   const openCommandPalette = () => {
     setCommandOpen(true);
   };
+
+  // Dynamic Title Logic
+  useEffect(() => {
+    const path = location.pathname;
+    switch(path) {
+      case '/':
+        document.title = `Yahyah Odin | Portfolio`;
+        break;
+      case '/portfolio':
+        document.title = `My Works | Yahyah Odin`;
+        break;
+      case '/cv':
+        document.title = `My Profile | Yahyah Odin`;
+        break;
+      default:
+        document.title = `Yahyah Odin | Portfolio`;
+    }
+  }, [location]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -96,7 +113,13 @@ function App() {
         </Box>
       </Box>
 
-      <CommandPalette open={commandOpen} setOpen={setCommandOpen} />
+      {/* FIX: Passed required props matching CommandPalette.tsx interface */}
+      <CommandPalette 
+        open={commandOpen} 
+        onClose={() => setCommandOpen(false)}
+        toggleTheme={toggleTheme}
+        mode={mode}
+      />
     </ThemeProvider>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Box, Container, Typography, ButtonBase, Grid, IconButton, useTheme, useMediaQuery, Stack, Theme, Divider, Backdrop, Chip } from '@mui/material';
+import { Box, Container, Typography, ButtonBase, Grid, IconButton, useTheme, useMediaQuery, Stack, Divider, Backdrop, Chip, Theme, SxProps } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Close, CalendarToday } from '@mui/icons-material';
 import { Footer } from '../components/Footer';
@@ -200,43 +200,65 @@ const ImageLightbox = ({ image, onClose }: { image: string | null, onClose: () =
     const handleWheel = (e: any) => {
         e.stopPropagation();
         const delta = e.deltaY * -0.001;
-        const newScale = Math.min(Math.max(1, scale + delta), 3); // Max 3x zoom
+        const newScale = Math.min(Math.max(1, scale + delta), 3); 
         setScale(newScale);
+    };
+
+    // Extracted lightbox styles
+    const backdropStyle: SxProps<Theme> = { 
+        zIndex: 9999, 
+        color: '#fff',
+        bgcolor: 'rgba(0,0,0,0.95)',
+        backdropFilter: 'blur(10px)'
+    };
+
+    const closeBtnStyle: SxProps<Theme> = { 
+        position: 'absolute', 
+        top: 20, 
+        right: 20, 
+        color: 'white', 
+        zIndex: 10 
+    };
+
+    const hintStyle: SxProps<Theme> = { 
+        position: 'absolute', 
+        bottom: 30, 
+        left: '50%', 
+        transform: 'translateX(-50%)', 
+        color: 'rgba(255,255,255,0.5)', 
+        pointerEvents: 'none' 
+    };
+
+    const imgContainerStyle: SxProps<Theme> = { 
+        width: '100%', 
+        height: '100%', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        overflow: 'hidden'
     };
 
     return (
         <Backdrop 
             open={!!image} 
             onClick={onClose} 
-            sx={{ 
-                zIndex: 9999, 
-                color: '#fff',
-                bgcolor: 'rgba(0,0,0,0.95)',
-                backdropFilter: 'blur(10px)'
-            }}
+            sx={backdropStyle}
         >
             <IconButton 
                 onClick={onClose}
-                sx={{ position: 'absolute', top: 20, right: 20, color: 'white', zIndex: 10 }}
+                sx={closeBtnStyle}
             >
                 <Close fontSize="large" />
             </IconButton>
             
-            <Box sx={{ position: 'absolute', bottom: 30, left: '50%', transform: 'translateX(-50%)', color: 'rgba(255,255,255,0.5)', pointerEvents: 'none' }}>
+            <Box sx={hintStyle}>
                 <Typography variant="caption">Scroll to Zoom • Drag to Pan</Typography>
             </Box>
 
             <Box 
                 onClick={(e: any) => e.stopPropagation()} 
                 onWheel={handleWheel}
-                sx={{ 
-                    width: '100%', 
-                    height: '100%', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center',
-                    overflow: 'hidden'
-                }}
+                sx={imgContainerStyle}
             >
                 {/* @ts-ignore */}
                 <Box 
@@ -263,13 +285,113 @@ export default function ProjectList() {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
   
-  // FIX: Track 'top' and 'height' for multiline support on mobile
   const [pillStyle, setPillStyle] = useState({ left: 0, top: 0, width: 0, height: 0, opacity: 0 });
   const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
 
   const theme = useTheme<Theme>();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isDark = theme.palette.mode === 'dark';
+
+  // --- EXTRACTED STYLES (Fixes TS complexity error) ---
+  
+  // 1. Header Styles
+  const headerContainerStyle: SxProps<Theme> = { mb: 8, textAlign: 'center' };
+  const headerTitleStyle: SxProps<Theme> = { mb: 2, fontSize: { xs: '3rem', md: '4.5rem' } };
+  const headerDescStyle: SxProps<Theme> = { maxWidth: '700px', mx: 'auto', lineHeight: 1.6, opacity: 0.8 };
+
+  // 2. Tab Styles
+  const tabsWrapperBoxStyle: SxProps<Theme> = { display: 'flex', justifyContent: 'center', mb: 8 };
+  
+  const tabsContainerStyle: SxProps<Theme> = {
+      p: 0.5, 
+      bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', 
+      backdropFilter: 'blur(10px)',
+      borderRadius: '50px',
+      display: 'inline-flex',
+      position: 'relative', 
+      border: '1px solid',
+      borderColor: 'divider',
+      flexWrap: 'wrap',
+      justifyContent: 'center'
+  };
+
+  // 3. Grid Styles
+  const gridWrapperStyle: SxProps<Theme> = { minHeight: '60vh' };
+  const gridContainerStyle: SxProps<Theme> = { mb: 4 };
+
+  // 4. Modal / Overlay Styles
+  const overlayBackdropStyle: SxProps<Theme> = {
+      position: 'absolute',
+      inset: 0,
+      bgcolor: theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.85)' : 'rgba(255,255,255,0.85)',
+      backdropFilter: 'blur(12px)',
+      pointerEvents: 'auto'
+  };
+
+  const modalContainerStyle: SxProps<Theme> = {
+      width: '100%',
+      maxWidth: '1600px', 
+      height: '100%',
+      maxHeight: '90vh',
+      bgcolor: 'background.paper',
+      borderRadius: { xs: 3, md: 4 },
+      overflow: 'hidden',
+      position: 'relative',
+      pointerEvents: 'auto',
+      display: 'flex',
+      flexDirection: 'column',
+      boxShadow: '0 50px 100px -20px rgba(0, 0, 0, 0.5)',
+      border: '1px solid',
+      borderColor: 'divider'
+  };
+
+  const modalCloseButtonStyle: SxProps<Theme> = { 
+      position: 'absolute', 
+      right: 24, 
+      top: 24, 
+      zIndex: 10,
+      bgcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+      color: 'text.primary',
+      backdropFilter: 'blur(4px)',
+      '&:hover': { bgcolor: 'primary.main', color: 'white' }
+  };
+
+  const modalContentBoxStyle: SxProps<Theme> = { overflowY: 'auto', flexGrow: 1, p: { xs: 4, md: 8 } };
+  const modalHeaderBoxStyle: SxProps<Theme> = { mb: 6, mt: 2 };
+  
+  const chipStyle: SxProps<Theme> = { 
+      bgcolor: 'primary.main', 
+      color: 'white', 
+      fontWeight: 700, 
+      borderRadius: 2,
+      height: 32
+  };
+
+  const dateTextStyle: SxProps<Theme> = { display: 'flex', alignItems: 'center', gap: 1 };
+  const projectTitleStyle: SxProps<Theme> = { fontWeight: 800, fontSize: { xs: '2.5rem', md: '4rem' }, mb: 3, lineHeight: 1.1 };
+  const projectDescStyle: SxProps<Theme> = { maxWidth: '900px', lineHeight: 1.6 };
+  
+  const dividerStyle: SxProps<Theme> = { mb: 6 };
+  const metaContainerStyle: SxProps<Theme> = { mb: 8 };
+  const challengeContainerStyle: SxProps<Theme> = { mb: 8 };
+  
+  const sectionTitleStyle: SxProps<Theme> = { fontWeight: 700 };
+  const sectionBodyStyle: SxProps<Theme> = { lineHeight: 1.8, fontSize: '1.1rem', textAlign: 'justify' };
+  
+  const galleryHeaderStyle: SxProps<Theme> = { mb: 3, fontWeight: 700, letterSpacing: '0.1em', color: 'text.secondary' };
+  
+  const galleryImageStyle: SxProps<Theme> = { 
+      width: '100%', 
+      borderRadius: 4, 
+      border: '1px solid',
+      borderColor: 'divider',
+      boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+      transition: 'transform 0.3s ease',
+      cursor: 'zoom-in',
+      '&:hover': { transform: 'scale(1.02)' }
+  };
+
+  // --- LOGIC ---
 
   const filteredProjects = useMemo(() => {
     return activeTab === 'All' 
@@ -295,7 +417,7 @@ export default function ProjectList() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [lightboxImage, selectedId]);
 
-  // Tab Pill Animation Calculation (REFACTORED FOR MOBILE)
+  // Tab Pill Animation Calculation
   useEffect(() => {
     const activeIndex = categories.indexOf(activeTab);
     // @ts-ignore
@@ -304,13 +426,13 @@ export default function ProjectList() {
     if (el) {
       setPillStyle({
         left: el.offsetLeft,
-        top: el.offsetTop, // Crucial for vertical wrapping
+        top: el.offsetTop, 
         width: el.clientWidth,
-        height: el.clientHeight, // Use actual button height
+        height: el.clientHeight, 
         opacity: 1
       });
     }
-  }, [activeTab, isMobile]); // Recalculate on resize/mobile switch
+  }, [activeTab, isMobile]);
 
   useEffect(() => {
     if (selectedId) {
@@ -330,31 +452,18 @@ export default function ProjectList() {
       transition={{ duration: 0.3 }}
     >
       <Container maxWidth="lg" sx={{ pt: 6, pb: 6 }}>
-        <Box sx={{ mb: 8, textAlign: 'center' }}>
+        <Box sx={headerContainerStyle}>
            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-               <Typography variant="h1" sx={{ mb: 2, fontSize: { xs: '3rem', md: '4.5rem' } }}>Highlighted Works</Typography>
-               <Typography variant="h5" color="text.secondary" sx={{ maxWidth: '700px', mx: 'auto', lineHeight: 1.6, opacity: 0.8 }}>
+               <Typography variant="h1" sx={headerTitleStyle}>Highlighted Works</Typography>
+               <Typography variant="h5" color="text.secondary" sx={headerDescStyle}>
                    Showcasing my best works for the past five years, from digital products to visual systems and technical experiments.
                </Typography>
            </motion.div>
         </Box>
 
         {/* TABS */}
-        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 8 }}>
-          <Box 
-              sx={{ 
-                  p: 0.5, 
-                  bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', 
-                  backdropFilter: 'blur(10px)',
-                  borderRadius: '50px',
-                  display: 'inline-flex',
-                  position: 'relative', 
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  flexWrap: 'wrap', // ALLOW WRAPPING ON MOBILE
-                  justifyContent: 'center'
-              }}
-          >
+        <Box sx={tabsWrapperBoxStyle}>
+          <Box sx={tabsContainerStyle}>
               {/* PILL */}
               <Box
                 component={motion.div}
@@ -363,7 +472,6 @@ export default function ProjectList() {
                 transition={{ type: "spring", stiffness: 250, damping: 25 }}
                 sx={{
                     position: 'absolute',
-                    // Top/Left/Width/Height controlled by animation state
                     bgcolor: isDark ? 'rgba(255,255,255,0.2)' : 'background.paper',
                     borderRadius: '50px',
                     boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
@@ -413,7 +521,7 @@ export default function ProjectList() {
         </Box>
 
         {/* Grid Container */}
-        <Box sx={{ minHeight: '60vh' }}>
+        <Box sx={gridWrapperStyle}>
             <AnimatePresence mode="wait">
                 <motion.div
                     key={activeTab} 
@@ -422,8 +530,7 @@ export default function ProjectList() {
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2, ease: "easeOut" }}
                 >
-                    {/* REDUCED GAP TO FOOTER: sx={{ mb: 4 }} was 8 */}
-                    <Grid container spacing={4} sx={{ mb: 4 }}>
+                    <Grid container spacing={4} sx={gridContainerStyle}>
                         {filteredProjects.map((project) => (
                             <ProjectCard 
                                 key={project.id} 
@@ -460,13 +567,7 @@ export default function ProjectList() {
                exit={{ opacity: 0 }}
                transition={{ duration: 0.15 }} 
                onClick={() => setSelectedId(null)}
-               sx={{
-                  position: 'absolute',
-                  inset: 0,
-                  bgcolor: theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.85)' : 'rgba(255,255,255,0.85)',
-                  backdropFilter: 'blur(12px)',
-                  pointerEvents: 'auto'
-               }}
+               sx={overlayBackdropStyle}
             />
 
             <Box
@@ -475,72 +576,42 @@ export default function ProjectList() {
                animate={{ opacity: 1, scale: 1, y: 0 }}
                exit={{ opacity: 0, scale: 0.95, y: 20 }}
                transition={{ type: "spring", damping: 25, stiffness: 350 }}
-               sx={{
-                  width: '100%',
-                  maxWidth: '1600px', 
-                  height: '100%',
-                  maxHeight: '90vh',
-                  bgcolor: 'background.paper',
-                  borderRadius: { xs: 3, md: 4 },
-                  overflow: 'hidden',
-                  position: 'relative',
-                  pointerEvents: 'auto',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  boxShadow: '0 50px 100px -20px rgba(0, 0, 0, 0.5)',
-                  border: '1px solid',
-                  borderColor: 'divider'
-               }}
+               sx={modalContainerStyle}
             >
                <IconButton 
                   onClick={() => setSelectedId(null)}
-                  sx={{ 
-                      position: 'absolute', 
-                      right: 24, 
-                      top: 24, 
-                      zIndex: 10,
-                      bgcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                      color: 'text.primary',
-                      backdropFilter: 'blur(4px)',
-                      '&:hover': { bgcolor: 'primary.main', color: 'white' }
-                  }}
+                  sx={modalCloseButtonStyle}
                >
                   <Close />
                </IconButton>
 
-               <Box sx={{ overflowY: 'auto', flexGrow: 1, p: { xs: 4, md: 8 } }}>
+               <Box sx={modalContentBoxStyle}>
                   
                   {/* HEADER */}
-                  <Box sx={{ mb: 6, mt: 2 }}>
+                  <Box sx={modalHeaderBoxStyle}>
                       <Stack direction="row" alignItems="center" gap={2} mb={2}>
                         <Chip 
                             label={selectedProject.category} 
-                            sx={{ 
-                                bgcolor: 'primary.main', 
-                                color: 'white', 
-                                fontWeight: 700, 
-                                borderRadius: 2,
-                                height: 32
-                            }} 
+                            sx={chipStyle} 
                         />
-                        <Typography variant="h6" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="h6" color="text.secondary" sx={dateTextStyle}>
                            <CalendarToday fontSize="small" /> {selectedProject.fullDate}
                         </Typography>
                       </Stack>
                       
-                      <Typography variant="h2" sx={{ fontWeight: 800, fontSize: { xs: '2.5rem', md: '4rem' }, mb: 3, lineHeight: 1.1 }}>
+                      <Typography variant="h2" sx={projectTitleStyle}>
                           {selectedProject.title}
                       </Typography>
                       
-                      <Typography variant="h5" color="text.secondary" sx={{ maxWidth: '900px', lineHeight: 1.6 }}>
+                      <Typography variant="h5" color="text.secondary" sx={projectDescStyle}>
                           {selectedProject.description}
                       </Typography>
                   </Box>
 
-                  <Divider sx={{ mb: 6 }} />
+                  <Divider sx={dividerStyle} />
 
                   {/* METADATA */}
-                  <Grid container spacing={4} sx={{ mb: 8 }}>
+                  <Grid container spacing={4} sx={metaContainerStyle}>
                     {selectedProject.details && (
                       <>
                         <Grid item xs={12} sm={4}>
@@ -566,23 +637,23 @@ export default function ProjectList() {
                   </Grid>
 
                   {/* CHALLENGE / SOLUTION */}
-                  <Grid container spacing={6} sx={{ mb: 8 }}>
+                  <Grid container spacing={6} sx={challengeContainerStyle}>
                     <Grid item xs={12} md={6}>
-                        <Typography variant="h4" gutterBottom sx={{ fontWeight: 700 }}>The Challenge</Typography>
+                        <Typography variant="h4" gutterBottom sx={sectionTitleStyle}>The Challenge</Typography>
                         <Typography 
                             variant="body1" 
                             color="text.secondary" 
-                            sx={{ lineHeight: 1.8, fontSize: '1.1rem', textAlign: 'justify' }} // Justified
+                            sx={sectionBodyStyle}
                         >
                             {selectedProject.challenge}
                         </Typography>
                     </Grid>
                     <Grid item xs={12} md={6}>
-                        <Typography variant="h4" gutterBottom sx={{ fontWeight: 700 }}>The Solution</Typography>
+                        <Typography variant="h4" gutterBottom sx={sectionTitleStyle}>The Solution</Typography>
                         <Typography 
                             variant="body1" 
                             color="text.secondary" 
-                            sx={{ lineHeight: 1.8, fontSize: '1.1rem', textAlign: 'justify' }} // Justified
+                            sx={sectionBodyStyle}
                         >
                             {selectedProject.solution}
                         </Typography>
@@ -590,7 +661,7 @@ export default function ProjectList() {
                   </Grid>
 
                   {/* GALLERY */}
-                  <Typography variant="overline" display="block" sx={{ mb: 3, fontWeight: 700, letterSpacing: '0.1em', color: 'text.secondary' }}>
+                  <Typography variant="overline" display="block" sx={galleryHeaderStyle}>
                       PROJECT GALLERY
                   </Typography>
                   <Grid container spacing={3}>
@@ -607,16 +678,7 @@ export default function ProjectList() {
                                     src={img} 
                                     loading="lazy"
                                     onClick={() => setLightboxImage(img)}
-                                    sx={{ 
-                                        width: '100%', 
-                                        borderRadius: 4, 
-                                        border: '1px solid',
-                                        borderColor: 'divider',
-                                        boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
-                                        transition: 'transform 0.3s ease',
-                                        cursor: 'zoom-in',
-                                        '&:hover': { transform: 'scale(1.02)' }
-                                    }} 
+                                    sx={galleryImageStyle} 
                                 />
                             </Grid>
                           )

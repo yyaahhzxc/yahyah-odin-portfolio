@@ -34,7 +34,7 @@ export const Preloader = () => {
             position: 'fixed',
             inset: 0,
             zIndex: 99999,
-            // @ts-ignore
+            // Removed @ts-ignore: standard MUI palette property
             backgroundColor: theme.palette.background.default,
             display: 'flex',
             alignItems: 'center',
@@ -55,7 +55,7 @@ export const Preloader = () => {
                    fontWeight: 800, 
                    letterSpacing: '-0.02em',
                    fontFamily: '"Space Grotesk", sans-serif',
-                   // @ts-ignore
+                   // Removed @ts-ignore: custom property should be recognized now
                    background: theme.custom?.iridescentGradient || theme.palette.primary.main,
                    WebkitBackgroundClip: 'text',
                    WebkitTextFillColor: 'transparent',
